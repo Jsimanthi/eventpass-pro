@@ -1,0 +1,1 @@
+ALTER TABLE invitees ADD COLUMN state VARCHAR(255) NOT NULL DEFAULT 'invited';

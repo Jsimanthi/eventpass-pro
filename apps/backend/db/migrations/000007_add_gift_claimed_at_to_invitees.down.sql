@@ -1,0 +1,1 @@
+ALTER TABLE invitees DROP COLUMN gift_claimed_at;

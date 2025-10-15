@@ -1,53 +1,93 @@
-# To learn more about how to use Nix to configure your environment
-# see: https://developers.google.com/idx/guides/customize-idx-env
-{ pkgs, ... }: {
-  # Which nixpkgs channel to use.
+{ pkgs, ... }:
+{
   channel = "stable-24.05"; # or "unstable"
-  # Use https://search.nixos.org/packages to find packages
+
   packages = [
-    # pkgs.go
-    # pkgs.python311
-    # pkgs.python311Packages.pip
-    # pkgs.nodejs_20
-    # pkgs.nodePackages.nodemon
+    pkgs.go_1_22
+    pkgs.gopls
+    pkgs.go-tools
+    pkgs.gotools
+    pkgs.delve
+    pkgs.docker-compose
+    pkgs.minio-client
+    pkgs.nodejs_20
+    pkgs.nodePackages.ts-node
+    pkgs.sqlc
+    pkgs.go-migrate
+    pkgs.redis
+    pkgs.rabbitmq-c
+    pkgs.gnumake
+    pkgs.postgresql
   ];
-  # Sets environment variables in the workspace
-  env = {};
+
+  env = {
+    DATABASE_URL = "postgres://user:password@localhost:5432/eventpass_dev?sslmode=disable";
+    REPLICA_DATABASE_URL = "postgres://user:password@localhost:5433/eventpass_replica?sslmode=disable";
+    MINIO_ENDPOINT = "localhost:9003";
+    MINIO_ACCESS_KEY_ID = "minioadmin";
+    MINIO_SECRET_ACCESS_KEY = "minioadminpassword";
+    MINIO_BUCKET_NAME = "eventpass";
+    HMAC_SECRET = "super-secret-hmac-key";
+    BASE_URL = "http://localhost:8080";
+    REDIS_URL = "redis://localhost:6379/0";
+    RABBITMQ_URL = "amqp://user:password@localhost:5472/";
+  };
+
+  services.docker = {
+    enable = true;
+  };
+
   idx = {
-    # Search for the extensions you want on https://open-vsx.org/ and use "publisher.id"
     extensions = [
-      # "vscodevim.vim"
-      "google.gemini-cli-vscode-ide-companion"
+      "golang.go"
     ];
-    # Enable previews
-    previews = {
-      enable = true;
-      previews = {
-        # web = {
-        #   # Example: run "npm run dev" with PORT set to IDX's defined port for previews,
-        #   # and show it in IDX's web preview panel
-        #   command = ["npm" "run" "dev"];
-        #   manager = "web";
-        #   env = {
-        #     # Environment variables to set for your server
-        #     PORT = "$PORT";
-        #   };
-        # };
-      };
-    };
-    # Workspace lifecycle hooks
+
     workspace = {
       # Runs when a workspace is first created
       onCreate = {
-        # Example: install JS dependencies from NPM
-        # npm-install = "npm install";
-        # Open editors for the following files by default, if they exist:
-        default.openFiles = [ ".idx/dev.nix" "README.md" ];
+        go-mod-tidy = "go mod tidy";
+        # Force-recreate to avoid port conflicts with previous runs.
+        docker-compose-up = "cd apps/backend && docker-compose up -d --force-recreate";
+        run-migrations = "migrate -path apps/backend/db/migrations -database \"$DATABASE_URL\" up";
+        sqlc-generate = "sqlc generate -f apps/backend/sqlc.yaml";
       };
-      # Runs when the workspace is (re)started
+
+      # Runs every time the workspace is (re)started
       onStart = {
-        # Example: start a background task to watch and re-build backend code
-        # watch-backend = "npm run watch-backend";
+        # Force-recreate to avoid port conflicts with previous runs.
+        docker-compose-up = "cd apps/backend && docker-compose up -d --force-recreate";
+        run-migrations = "migrate -path apps/backend/db/migrations -database \"$DATABASE_URL\" up";
+        sqlc-generate = "sqlc generate -f apps/backend/sqlc.yaml";
+      };
+    };
+
+    previews = {
+      enable = true;
+      previews = {
+        backend = {
+          command = ["go" "run" "./apps/backend"];
+          manager = "web";
+        };
+        frontend = {
+          command = ["npm" "run" "dev" "--prefix" "apps/frontend"];
+          manager = "web";
+        };
+        minioconsole = {
+          command = ["echo" "MinIO console running on http://localhost:9004"];
+          manager = "web";
+        };
+        worker = {
+          command = ["go" "run" "./apps/workers"];
+          manager = "web";
+        };
+        reprinter = {
+          command = ["go" "run" "./apps/reprinter"];
+          manager = "web";
+        };
+        rabbitmq = {
+          command = ["echo" "RabbitMQ management UI running on http://localhost:15672"];
+          manager = "web";
+        };
       };
     };
   };

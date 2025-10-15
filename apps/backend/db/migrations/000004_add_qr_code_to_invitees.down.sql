@@ -1,0 +1,1 @@
+ALTER TABLE invitees DROP COLUMN qr_code_url, DROP COLUMN hmac_signature;

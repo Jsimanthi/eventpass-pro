@@ -1,0 +1,3 @@
+ALTER TABLE invitees
+ADD COLUMN expires_at TIMESTAMPTZ,
+ADD COLUMN status VARCHAR(255) NOT NULL DEFAULT 'created';

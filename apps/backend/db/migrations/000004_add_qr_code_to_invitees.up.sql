@@ -1,0 +1,1 @@
+ALTER TABLE invitees ADD COLUMN qr_code_url TEXT, ADD COLUMN hmac_signature TEXT;

@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "memory_file": "packages/ai-memory/plan-memory.json",
+  "template_file": "packages/ai-memory/plan-template.json",
+  "phase_transition": {
+    "require_complete_previous": true,
+    "auto_advance_when": ["scripted", "unit_tests_passed"],
+    "manual_confirm_for": ["db_migration", "production_deploy"]
+  },
+  "memory_sync": {
+    "auto_write_on_step_complete": true,
+    "backup_interval_minutes": 5,
+    "backup_path": "packages/ai-memory/backups/"
+  },
+  "error_handling": {
+    "retry_limit": 3,
+    "retry_backoff_seconds": 30,
+    "on_persistent_error": "pause_and_notify"
+  },
+  "cli_behavior": {
+    "show_progress": true,
+    "allow_resume": true,
+    "allow_force_advance": false
+  },
+  "logging": {
+    "level": "info",
+    "event_emit_channel": "ai-events"
+  }
+}

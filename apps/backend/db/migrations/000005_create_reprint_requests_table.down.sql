@@ -1,0 +1,1 @@
+DROP TABLE reprint_requests;

@@ -1,0 +1,1 @@
+ALTER TABLE orders DROP COLUMN deleted_at, DROP COLUMN anonymized_at;

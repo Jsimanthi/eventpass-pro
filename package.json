@@ -1,0 +1,17 @@
+{
+  "name": "event-pass-pro",
+  "version": "1.0.0",
+  "description": "EventPass Pro monorepo",
+  "main": "index.js",
+  "scripts": {
+    "dev": "docker-compose up -d",
+    "stop": "docker-compose down",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "workspaces": [
+    "packages/*"
+  ]
+}

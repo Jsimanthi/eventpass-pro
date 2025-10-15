@@ -1,0 +1,1 @@
+ALTER TABLE invitees ADD COLUMN gift_claimed_at TIMESTAMP;

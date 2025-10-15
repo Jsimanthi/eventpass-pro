@@ -1,0 +1,1 @@
+ALTER TABLE invitees ADD COLUMN deleted_at TIMESTAMPTZ, ADD COLUMN anonymized_at TIMESTAMPTZ;
