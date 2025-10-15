@@ -59,7 +59,8 @@ services:
   # The Go backend API
   backend:
     build:
-      context: ./apps/backend
+      context: .
+      dockerfile: ./apps/backend/Dockerfile
     restart: always
     depends_on:
       - postgres
@@ -73,7 +74,8 @@ services:
   # The Next.js frontend
   frontend:
     build:
-      context: ./apps/frontend
+      context: .
+      dockerfile: ./apps/frontend/Dockerfile
     restart: always
     depends_on:
       - backend
@@ -87,7 +89,8 @@ services:
   # The background worker for processing tasks
   worker:
     build:
-      context: ./apps/workers
+      context: .
+      dockerfile: ./apps/workers/Dockerfile
     restart: always
     depends_on:
       - postgres
