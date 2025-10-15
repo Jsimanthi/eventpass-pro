@@ -14,7 +14,7 @@ func createContinuousAggregates(pool *pgxpool.Pool) {
 		CREATE MATERIALIZED VIEW IF NOT EXISTS hourly_check_ins
 		WITH (timescaledb.continuous) AS
 		SELECT
-			time_bucket(INTERVAL '''1 hour''', created_at) AS hour,
+			time_bucket(INTERVAL '1 hour', created_at) AS hour,
 			COUNT(*) AS check_in_count
 		FROM check_ins
 		GROUP BY hour;
@@ -25,10 +25,10 @@ func createContinuousAggregates(pool *pgxpool.Pool) {
 
 	// Add refresh policy for hourly check-ins
 	_, err = pool.Exec(context.Background(), `
-		SELECT add_continuous_aggregate_policy('''hourly_check_ins''',
-			start_offset => INTERVAL '''3 hour''',
-			end_offset => INTERVAL '''1 hour''',
-			schedule_interval => INTERVAL '''1 hour''');
+		SELECT add_continuous_aggregate_policy('hourly_check_ins',
+			start_offset => INTERVAL '3 hour',
+			end_offset => INTERVAL '1 hour',
+			schedule_interval => INTERVAL '1 hour');
 	`)
 	if err != nil {
 		// Check if the error is a "duplicate object" error (code 42710). If so, it's safe to ignore.
@@ -44,7 +44,7 @@ func createContinuousAggregates(pool *pgxpool.Pool) {
 		CREATE MATERIALIZED VIEW IF NOT EXISTS daily_check_ins
 		WITH (timescaledb.continuous) AS
 		SELECT
-			time_bucket(INTERVAL '''1 day''', created_at) AS day,
+			time_bucket(INTERVAL '1 day', created_at) AS day,
 			COUNT(*) AS check_in_count
 		FROM check_ins
 		GROUP BY day;
@@ -55,10 +55,10 @@ func createContinuousAggregates(pool *pgxpool.Pool) {
 
 	// Add refresh policy for daily check-ins
 	_, err = pool.Exec(context.Background(), `
-		SELECT add_continuous_aggregate_policy('''daily_check_ins''',
-			start_offset => INTERVAL '''3 day''',
-			end_offset => INTERVAL '''1 day''',
-			schedule_interval => INTERVAL '''1 day''');
+		SELECT add_continuous_aggregate_policy('daily_check_ins',
+			start_offset => INTERVAL '3 day',
+			end_offset => INTERVAL '1 day',
+			schedule_interval => INTERVAL '1 day');
 	`)
 	if err != nil {
 		// Check if the error is a "duplicate object" error (code 42710). If so, it's safe to ignore.
