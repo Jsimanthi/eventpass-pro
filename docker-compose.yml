@@ -1,29 +1,101 @@
+# This is the single source of truth for running the entire EventPass Pro application.
+# It defines all the services (backend, frontend, databases, etc.) and how they connect.
+# To run the entire stack, use 'docker-compose up --build' from the project root.
 
-version: '3.8'
 services:
+  # The primary PostgreSQL database
   postgres:
     image: postgres:15
     restart: always
     environment:
-      POSTGRES_DB: eventpass
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  # The read-replica PostgreSQL database
   replica:
     image: postgres:15
     restart: always
     environment:
-      POSTGRES_DB: eventpass_replica
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${POSTGRES_DB}_replica # Note: The DB name is different
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - '5433:5432'
+      - '5433:5432' # Expose on a different host port to avoid conflicts
     volumes:
       - replica_data:/var/lib/postgresql/data
+
+  # Minio for S3-compatible object storage
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000" # API port
+      - "9001:9001" # Console UI port
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadminpassword
+    command: server /data --console-address ":9001"
+
+  # Redis for caching and session management
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  # RabbitMQ for message queuing
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"   # AMQP port for applications
+      - "15672:15672" # Management UI port
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+
+  # The Go backend API
+  backend:
+    build:
+      context: ./apps/backend
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+
+  # The Next.js frontend
+  frontend:
+    build:
+      context: ./apps/frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXT_PUBLIC_API_URL=http://backend:8080 # Tells the frontend how to reach the backend inside the Docker network
+
+  # The background worker for processing tasks
+  worker:
+    build:
+      context: ./apps/workers
+    restart: always
+    depends_on:
+      - postgres
+      - replica
+      - rabbitmq
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - REPLICA_DATABASE_URL=${REPLICA_DATABASE_URL}
 
 volumes:
   postgres_data:
