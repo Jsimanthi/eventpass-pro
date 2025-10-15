@@ -21,7 +21,7 @@ CREATE TABLE invitees (
     email VARCHAR(255) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    qr_code_url TEXT, 
+    qr_code TEXT, -- This was incorrectly named qr_code_url
     hmac_signature TEXT,
     state VARCHAR(255) NOT NULL DEFAULT 'invited',
     gift_claimed_at TIMESTAMP,
@@ -49,9 +49,13 @@ CREATE TABLE orders (
     anonymized_at TIMESTAMPTZ
 );
 
--- This table was missing. It is used for analytics.
+-- This table is for analytics.
 CREATE TABLE check_ins (
     id SERIAL PRIMARY KEY,
     invitee_id INTEGER NOT NULL REFERENCES invitees(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- This command was missing. It converts the check_ins table into a hypertable,
+-- which is required for creating continuous aggregates.
+SELECT create_hypertable('check_ins', 'created_at');
