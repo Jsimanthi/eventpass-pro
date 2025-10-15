@@ -17,22 +17,12 @@ import (
 
 	"eventpass.pro/apps/backend/db"
 	"github.com/go-redis/redis/v8"
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/minio/minio-go/v7"
 	qrcode "github.com/skip2/go-qrcode"
 	"github.com/streadway/amqp"
-	"golang.org/x/crypto/bcrypt"
 )
-
-type handler struct {
-	queries     *db.Queries
-	minioClient *minio.Client
-	rdb         *redis.Client
-	amqpChannel *amqp.Channel
-}
 
 func (h *handler) TestPublish(w http.ResponseWriter, r *http.Request) {
 	err := h.amqpChannel.Publish(
@@ -104,53 +94,6 @@ func (h *handler) ScanQRCode(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(updatedInvitee)
 }
 
-func (h *handler) Login(w http.ResponseWriter, r *http.Request) {
-	var loginRequest struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-
-	if err := json.NewDecoder(r.Body).Decode(&loginRequest); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	user, err := h.queries.GetUserByEmail(context.Background(), loginRequest.Email)
-	if err != nil {
-		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
-		return
-	}
-
-	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(loginRequest.Password)); err != nil {
-		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
-		return
-	}
-
-	token, err := h.createLogin(user.ID)
-	if err != nil {
-		http.Error(w, "Failed to create token", http.StatusInternalServerError)
-		return
-	}
-
-	json.NewEncoder(w).Encode(map[string]string{
-		"token": token,
-	})
-}
-
-func (h *handler) createLogin(userID pgtype.UUID) (string, error) {
-	// Create a new token object, specifying signing method and the claims
-	// you would like it to contain.
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": userID,
-		"exp":     time.Now().Add(time.Hour * 24).Unix(),
-	})
-
-	// Sign and get the complete encoded token as a string using the secret
-	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
-
-	return tokenString, err
-}
-
 func (h *handler) ListEvents(w http.ResponseWriter, r *http.Request) {
 	events, err := h.queries.ListEvents(context.Background())
 	if err != nil {
@@ -159,39 +102,6 @@ func (h *handler) ListEvents(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(events)
-}
-
-func (h *handler) CreateUser(w http.ResponseWriter, r *http.Request) {
-	var newUser struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-
-	if err := json.NewDecoder(r.Body).Decode(&newUser); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
-	if err != nil {
-		http.Error(w, "Failed to hash password", http.StatusInternalServerError)
-		return
-	}
-
-	user, err := h.queries.CreateUser(context.Background(), db.CreateUserParams{
-		ID:           pgtype.UUID{Bytes: uuid.New(), Valid: true},
-		Email:        newUser.Email,
-		PasswordHash: string(hashedPassword),
-	})
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	go sendWelcomeEmail(newUser.Email, newUser.Email)
-
-	json.NewEncoder(w).Encode(user)
 }
 
 func (h *handler) CreateEvent(w http.ResponseWriter, r *http.Request) {
@@ -426,69 +336,6 @@ func (h *handler) ServeQRCode(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *handler) ReprintQRCode(w http.ResponseWriter, r *http.Request) {
-	user, ok := r.Context().Value("user").(db.User)
-	if !ok {
-		http.Error(w, "User not authenticated", http.StatusUnauthorized)
-		return
-	}
-
-	vars := mux.Vars(r)
-	inviteeID, err := strconv.Atoi(vars["invitee_id"])
-	if err != nil {
-		http.Error(w, "Invalid invitee ID", http.StatusBadRequest)
-		return
-	}
-
-	// Create a reprint request record
-	_, err = h.queries.CreateReprintRequest(context.Background(), db.CreateReprintRequestParams{
-		InviteeID: int32(inviteeID),
-		UserID:    user.ID,
-	})
-	if err != nil {
-		http.Error(w, "Failed to create reprint request", http.StatusInternalServerError)
-		return
-	}
-
-	// Regenerate the QR code
-	hmacSecret := os.Getenv("HMAC_SECRET")
-	baseURL := os.Getenv("BASE_URL")
-	bucketName := os.Getenv("MINIO_BUCKET_NAME")
-
-	mac := hmac.New(sha256.New, []byte(hmacSecret))
-	mac.Write([]byte(strconv.Itoa(inviteeID)))
-	hmacSignature := hex.EncodeToString(mac.Sum(nil))
-
-	validationURL := fmt.Sprintf("%s/validate?invitee_id=%d&signature=%s", baseURL, inviteeID, hmacSignature)
-
-	png, err := qrcode.Encode(validationURL, qrcode.Medium, 256)
-	if err != nil {
-		http.Error(w, "Failed to generate QR code", http.StatusInternalServerError)
-		return
-	}
-
-	objectName := fmt.Sprintf("%d.png", inviteeID)
-	_, err = h.minioClient.PutObject(context.Background(), bucketName, objectName, bytes.NewReader(png), int64(len(png)), minio.PutObjectOptions{ContentType: "image/png"})
-	if err != nil {
-		http.Error(w, "Failed to upload QR code to MinIO", http.StatusInternalServerError)
-		return
-	}
-
-	qrCodeURL := fmt.Sprintf("/qrcodes/%s", objectName)
-
-	updatedInvitee, err := h.queries.UpdateInvitee(context.Background(), db.UpdateInviteeParams{
-		ID:            int32(inviteeID),
-		QrCodeUrl:     pgtype.Text{String: qrCodeURL, Valid: true},
-		HmacSignature: pgtype.Text{String: hmacSignature, Valid: true},
-	})
-	if err != nil {
-		http.Error(w, "Failed to update invitee with new QR code", http.StatusInternalServerError)
-		return
-	}
-
-	json.NewEncoder(w).Encode(updatedInvitee)
-}
-
 func (h *handler) ExportInvitees(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	eventID, err := strconv.Atoi(vars["id"])
@@ -534,13 +381,13 @@ func (h *handler) ExportInvitees(w http.ResponseWriter, r *http.Request) {
 
 func (h *handler) AnonymizeUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	userID, err := uuid.Parse(vars["id"])
+	userID, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
 		return
 	}
 
-	if err := h.queries.AnonymizeUser(context.Background(), pgtype.UUID{Bytes: userID, Valid: true}); err != nil {
+	if err := h.queries.AnonymizeUser(context.Background(), pgtype.UUID{}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

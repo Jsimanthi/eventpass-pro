@@ -1,23 +1,50 @@
 CREATE TABLE events (
     id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    date TIMESTAMPTZ NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    name VARCHAR(255) NOT NULL,
+    date TIMESTAMP NOT NULL,
+    location VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMPTZ, 
+    anonymized_at TIMESTAMPTZ
 );
 
 CREATE TABLE invitees (
     id SERIAL PRIMARY KEY,
     event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-    name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    status TEXT NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    email VARCHAR(255) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    qr_code_url TEXT, 
+    hmac_signature TEXT,
+    state VARCHAR(255) NOT NULL DEFAULT 'invited',
+    gift_claimed_at TIMESTAMP,
+    expires_at TIMESTAMPTZ,
+    status VARCHAR(255) NOT NULL DEFAULT 'created',
+    deleted_at TIMESTAMPTZ, 
+    anonymized_at TIMESTAMPTZ,
+    UNIQUE(event_id, email)
 );
 
-CREATE TABLE check_ins (
+CREATE TABLE reprint_requests (
+  id SERIAL PRIMARY KEY,
+  invitee_id INTEGER NOT NULL REFERENCES invitees(id),
+  user_id UUID NOT NULL REFERENCES users(id),
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
-    invitee_id INTEGER NOT NULL REFERENCES invitees(id) ON DELETE CASCADE,
-    scanned_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    user_id uuid NOT NULL,
+    event_id INT NOT NULL,
+    status VARCHAR(255) NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    deleted_at TIMESTAMPTZ, 
+    anonymized_at TIMESTAMPTZ
 );
-
--- Create other tables as needed based on your application's requirements

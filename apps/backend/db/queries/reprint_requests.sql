@@ -2,6 +2,8 @@
 INSERT INTO reprint_requests (
   invitee_id,
   user_id
-) VALUES (
+)
+VALUES (
   $1, $2
-) RETURNING *;
+)
+RETURNING *;

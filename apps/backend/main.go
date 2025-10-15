@@ -15,6 +15,13 @@ import (
 	"github.com/streadway/amqp"
 )
 
+type handler struct {
+	queries     *db.Queries
+	minioClient *minio.Client
+	rdb         *redis.Client
+	amqpChannel *amqp.Channel
+}
+
 func main() {
 	databaseUrl := os.Getenv("DATABASE_URL")
 	if databaseUrl == "" {
@@ -100,7 +107,7 @@ func main() {
 	r.HandleFunc("/qrcodes/{objectName}", h.ServeQRCode).Methods("GET")
 	r.HandleFunc("/users", h.CreateUser).Methods("POST")
 	r.HandleFunc("/login", h.Login).Methods("POST")
-	r.HandleFunc("/scan/{qr}", h.ScanQRCode).Methods("POST")
+	r.HandleFunc("scan/{qr}", h.ScanQRCode).Methods("POST")
 	r.HandleFunc("/ws", h.HandleWebSocket)
 	r.Handle("/metrics", promhttp.Handler())
 
@@ -114,7 +121,7 @@ func main() {
 	authRouter.HandleFunc("/events/{id}", h.DeleteEvent).Methods("DELETE")
 	authRouter.HandleFunc("/events/{id}/invitees", h.UploadInvitees).Methods("POST")
 	authRouter.HandleFunc("/events/{id}/report", h.ExportInvitees).Methods("GET")
-	authRouter.HandleFunc("/invitees/{invitee_id}/reprint", h.ReprintQRCode).Methods("POST")
+	authRouter.HandleFunc("/invitees/{invitee_id}/reprint", h.ReprintRequest).Methods("POST")
 	authRouter.HandleFunc("/users/{id}/anonymize", h.AnonymizeUser).Methods("POST")
 	authRouter.HandleFunc("/invitees/{id}/anonymize", h.AnonymizeInvitee).Methods("POST")
 	authRouter.HandleFunc("/orders/{id}/anonymize", h.AnonymizeOrder).Methods("POST")
