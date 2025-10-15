@@ -28,7 +28,7 @@ func sendWelcomeEmail(toEmail, toName string) {
 	}
 }
 
-func sendWhatsAppMessage(to, body string) {
-	// TODO: Implement WhatsApp/Twilio integration
-	log.Printf("Sending WhatsApp message to %s: %s", to, body)
-}
+// func sendWhatsAppMessage(to, body string) {
+// 	// TODO: Implement WhatsApp/Twilio integration
+// 	log.Printf("Sending WhatsApp message to %s: %s", to, body)
+// }
