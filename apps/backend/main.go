@@ -2,8 +2,11 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"log"
+	"net/http"
 	"os"
+	"os/exec"
 
 	"eventpass.pro/apps/backend/db"
 	"github.com/go-redis/redis/v8"
@@ -35,8 +38,6 @@ func main() {
 	defer pool.Close()
 
 	queries := db.New(pool)
-
-	createContinuousAggregates(pool)
 
 	// MinIO client initialization
 	endpoint := os.Getenv("MINIO_ENDPOINT")
@@ -94,10 +95,6 @@ func main() {
 
 	h := &handler{queries: queries, minioClient: minioClient, rdb: rdb, amqpChannel: amqpChannel}
 
-	//Cronjobs
-	h.StartInviteeExpirationCron()
-	h.StartOrderExpirationCron()
-
 	r.Use(loggingMiddleware)
 	r.Use(rateLimitMiddleware)
 
@@ -108,7 +105,7 @@ func main() {
 	r.HandleFunc("/users", h.CreateUser).Methods("POST")
 	r.HandleFunc("/login", h.Login).Methods("POST")
 	r.HandleFunc("scan/{qr}", h.ScanQRCode).Methods("POST")
-	r.HandleFunc("/ws", h.HandleWebSocket)
+	r.HandleFunc("/ws", h.HandleWebSocket).Methods("GET")
 	r.Handle("/metrics", promhttp.Handler())
 
 	// Authenticated routes
@@ -132,4 +129,30 @@ func main() {
 	}
 
 	ensureTLS(port, r)
+}
+
+func ensureTLS(port string, router http.Handler) {
+	certFile := "cert.pem"
+	keyFile := "key.pem"
+
+	if _, err := os.Stat(certFile); os.IsNotExist(err) {
+		// Create a simple self-signed certificate for local development.
+		// This is not for production use.
+		cmd := exec.Command("openssl", "req", "-x509", "-newkey", "rsa:4096", "-keyout", keyFile, "-out", certFile, "-days", "365", "-nodes", "-subj", "/CN=localhost")
+		err = cmd.Run()
+		if err != nil {
+			log.Fatalf("Failed to generate self-signed certificate: %v", err)
+		}
+	}
+
+	server := &http.Server{
+		Addr:    ":" + port,
+		Handler: router,
+		TLSConfig: &tls.Config{
+			MinVersion: tls.VersionTLS12,
+		},
+	}
+
+	log.Printf("Starting server on https://localhost:%s", port)
+	log.Fatal(server.ListenAndServeTLS(certFile, keyFile))
 }
