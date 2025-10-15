@@ -76,6 +76,7 @@ services:
       - MINIO_ACCESS_KEY_ID=${MINIO_ACCESS_KEY_ID}
       - MINIO_SECRET_ACCESS_KEY=${MINIO_SECRET_ACCESS_KEY}
       - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
+    command: ["wait-for-services.sh", "postgres:5432", "rabbitmq:5672", "redis:6379", "--", "/app/backend"]
 
   # The Next.js frontend
   frontend:
@@ -106,6 +107,7 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - REPLICA_DATABASE_URL=${REPLICA_DATABASE_URL}
       - RABBITMQ_URL=${RABBITMQ_URL}
+    command: ["wait-for-services.sh", "postgres:5432", "rabbitmq:5672", "--", "/app/worker"]
   
   # The background reprinter for processing tasks
   reprinter:
@@ -121,6 +123,7 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - REPLICA_DATABASE_URL=${REPLICA_DATABASE_URL}
       - RABBITMQ_URL=${RABBITMQ_URL}
+    command: ["wait-for-services.sh", "postgres:5432", "rabbitmq:5672", "--", "/app/reprinter"]
 
 volumes:
   postgres_data:

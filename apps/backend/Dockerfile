@@ -1,34 +1,24 @@
-# Dockerfile for the Go backend application (Monorepo-Aware)
-
-# Stage 1: Build the application
-FROM golang:1.24-alpine AS builder
+# Use a Golang base image
+FROM golang:1.21-alpine
 
 # Set the working directory
 WORKDIR /app
 
-# Copy module files first to leverage Docker cache
+# Copy the Go modules files
 COPY go.mod go.sum ./
 
-# Download dependencies
+# Download the Go modules
 RUN go mod download
 
-# Copy the entire source code into the container
-# This makes all local packages available to the Go compiler
+# Copy the source code
 COPY . .
 
-# Build the backend application specifically
-RUN CGO_ENABLED=0 GOOS=linux go build -a -o /app/main ./apps/backend
+# Build the Go application
+RUN go build -o /app/backend ./apps/backend
 
-# Stage 2: Create the final, minimal image
-FROM alpine:latest
+# Copy the wait script
+COPY wait-for-services.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/wait-for-services.sh
 
-RUN apk --no-cache add ca-certificates
-
-WORKDIR /root/
-
-# Copy the built binary from the builder stage
-COPY --from=builder /app/main .
-
-EXPOSE 8080
-
-CMD ["./main"]
+# The command to run the application (will be overridden in docker-compose.yml)
+CMD ["/app/backend"]
