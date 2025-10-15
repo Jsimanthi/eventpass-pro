@@ -5,12 +5,17 @@
   "mounts": [
     "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
   ],
+
+  "features": {
+    // This is the crucial missing piece. It installs Nix into the container.
+    "ghcr.io/devcontainers-contrib/features/nix:2": {}
+  },
+
   "postCreateCommand": "/bin/bash ./.devcontainer/post-create.sh",
+  
   "customizations": {
     "vscode": {
       "settings": {
-        // This setting will make all new terminals automatically use our wrapper script,
-        // which launches the nix-shell.
         "terminal.integrated.shell.linux": "/bin/bash",
         "terminal.integrated.shellArgs.linux": [
           "-c",
