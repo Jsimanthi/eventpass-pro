@@ -4,6 +4,9 @@ FROM golang:1.24-alpine
 # Set the working directory
 WORKDIR /app
 
+# Install openssl, which is needed for generating self-signed certs for local dev
+RUN apk add --no-cache openssl
+
 # Copy the Go modules files
 COPY go.mod go.sum ./
 
