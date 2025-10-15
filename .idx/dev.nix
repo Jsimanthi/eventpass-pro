@@ -1,94 +1,57 @@
-{ pkgs, ... }:
-{
-  channel = "stable-24.05"; # or "unstable"
+# This is the Nix configuration file for your project.
+# It defines the development environment, including the packages and extensions that are installed.
+# For more information, see the Nix documentation: https://nixos.org/manual/nix/stable/ 
 
+{
+  pkgs, 
+  ... 
+}: {
+  # The channel determines which package versions are available.
+  channel = "stable-24.05"; # You can also use "unstable"
+
+  # A list of packages to install from the specified channel.
+  # You can search for packages on the NixOS package search: https://search.nixos.org/packages
   packages = [
-    pkgs.go_1_22
-    pkgs.gopls
-    pkgs.go-tools
-    pkgs.gotools
-    pkgs.delve
-    pkgs.docker-compose
-    pkgs.minio-client
-    pkgs.nodejs_20
-    pkgs.nodePackages.ts-node
-    pkgs.sqlc
-    pkgs.go-migrate
-    pkgs.redis
-    pkgs.rabbitmq-c
-    pkgs.gnumake
-    pkgs.postgresql
+    pkgs.go # For the Go backend
+    pkgs.nodejs_20 # For the Node.js frontend
   ];
 
-  env = {
-    DATABASE_URL = "postgres://user:password@localhost:5432/eventpass_dev?sslmode=disable";
-    REPLICA_DATABASE_URL = "postgres://user:password@localhost:5433/eventpass_replica?sslmode=disable";
-    MINIO_ENDPOINT = "localhost:9003";
-    MINIO_ACCESS_KEY_ID = "minioadmin";
-    MINIO_SECRET_ACCESS_KEY = "minioadminpassword";
-    MINIO_BUCKET_NAME = "eventpass";
-    HMAC_SECRET = "super-secret-hmac-key";
-    BASE_URL = "http://localhost:8080";
-    REDIS_URL = "redis://localhost:6379/0";
-    RABBITMQ_URL = "amqp://user:password@localhost:5472/";
-  };
+  # A set of environment variables to define within the workspace.
+  # env = {
+  #   API_KEY = "your-secret-key";
+  # };
 
-  services.docker = {
-    enable = true;
-  };
-
+  # VS Code extensions to install from the Open VSX Registry.
+  # You can search for extensions on the Open VSX Registry: https://open-vsx.org/
   idx = {
     extensions = [
       "golang.go"
     ];
 
+    # Workspace lifecycle hooks.
     workspace = {
-      # Runs when a workspace is first created
+      # Runs when a workspace is first created.
       onCreate = {
-        go-mod-tidy = "go mod tidy";
-        # Force-recreate to avoid port conflicts with previous runs.
-        docker-compose-up = "cd apps/backend && docker-compose up -d --force-recreate";
-        run-migrations = "migrate -path apps/backend/db/migrations -database \"$DATABASE_URL\" up";
-        sqlc-generate = "sqlc generate -f apps/backend/sqlc.yaml";
+        # Example: install dependencies
+        # npm-install = "npm install";
       };
 
-      # Runs every time the workspace is (re)started
+      # Runs every time the workspace is (re)started.
       onStart = {
-        # Force-recreate to avoid port conflicts with previous runs.
-        docker-compose-up = "cd apps/backend && docker-compose up -d --force-recreate";
-        run-migrations = "migrate -path apps/backend/db/migrations -database \"$DATABASE_URL\" up";
-        sqlc-generate = "sqlc generate -f apps/backend/sqlc.yaml";
+        # Example: start a development server
+        # start-server = "npm run dev";
       };
     };
 
-    previews = {
-      enable = true;
-      previews = {
-        backend = {
-          command = ["go" "run" "./apps/backend"];
-          manager = "web";
-        };
-        frontend = {
-          command = ["npm" "run" "dev" "--prefix" "apps/frontend"];
-          manager = "web";
-        };
-        minioconsole = {
-          command = ["echo" "MinIO console running on http://localhost:9004"];
-          manager = "web";
-        };
-        worker = {
-          command = ["go" "run" "./apps/workers"];
-          manager = "web";
-        };
-        reprinter = {
-          command = ["go" "run" "./apps/reprinter"];
-          manager = "web";
-        };
-        rabbitmq = {
-          command = ["echo" "RabbitMQ management UI running on http://localhost:15672"];
-          manager = "web";
-        };
-      };
-    };
+    # Web previews for your application.
+    # previews = {
+    #   enable = true;
+    #   previews = {
+    #     web = {
+    #       command = ["npm" "run" "dev" "--" "--port" "$PORT"];
+    #       manager = "web";
+    #     };
+    #   };
+    # };
   };
 }
