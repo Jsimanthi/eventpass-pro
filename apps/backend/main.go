@@ -95,6 +95,10 @@ func main() {
 
 	h := &handler{queries: queries, minioClient: minioClient, rdb: rdb, amqpChannel: amqpChannel}
 
+	h.StartInviteeExpirationCron()
+	h.StartOrderExpirationCron()
+	createContinuousAggregates(pool)
+
 	r.Use(loggingMiddleware)
 	r.Use(rateLimitMiddleware)
 

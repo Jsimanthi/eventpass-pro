@@ -51,7 +51,7 @@ func (h *handler) createLogin(userID pgtype.UUID) (string, error) {
 	// Create a new token object, specifying signing method and the claims
 	// you would like it to contain.
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": uuid.UUID(userID.Bytes).String(),
+		"user_id": userID,
 		"exp":     time.Now().Add(time.Hour * 24).Unix(),
 	})
 
@@ -88,8 +88,6 @@ func (h *handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	go sendWelcomeEmail(newUser.Email, newUser.Email)
 
 	json.NewEncoder(w).Encode(user)
 }

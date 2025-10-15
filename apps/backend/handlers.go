@@ -16,7 +16,7 @@ import (
 	"time"
 
 	"eventpass.pro/apps/backend/db"
-	"github.com/go-redis/redis/v8"
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/minio/minio-go/v7"
@@ -381,13 +381,18 @@ func (h *handler) ExportInvitees(w http.ResponseWriter, r *http.Request) {
 
 func (h *handler) AnonymizeUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	userID, err := strconv.Atoi(vars["id"])
+	userIDStr := vars["id"]
+	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
 		return
 	}
 
-	if err := h.queries.AnonymizeUser(context.Background(), pgtype.UUID{}); err != nil {
+	var userUUID pgtype.UUID
+	userUUID.Bytes = userID
+	userUUID.Valid = true
+
+	if err := h.queries.AnonymizeUser(context.Background(), userUUID); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
