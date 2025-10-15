@@ -1,28 +1,31 @@
-# Dockerfile for the Go worker application
+# Dockerfile for the Go worker application (Monorepo-Aware)
 
-# Start with a Go base image for building the application
-FROM golang:1.21-alpine as builder
+# Stage 1: Build the application
+FROM golang:1.21-alpine AS builder
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the source code into the container
-COPY . .
+# Copy the Go module files from the project root
+COPY go.mod go.sum ./
 
-# Download Go module dependencies
-RUN go mod tidy
+# Download all dependencies for the monorepo
+RUN go mod download
 
-# Build the Go application
-RUN go build -o /worker-app .
+# Copy the source code for the worker application
+COPY ./apps/workers/ ./apps/workers/
 
-# Start a new, minimal stage for the final image
+# Build the worker application specifically
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app/worker-app ./apps/workers
+
+# Stage 2: Create the final, minimal image
 FROM alpine:latest
 
-# Set the working directory
-WORKDIR /
+RUN apk --no-cache add ca-certificates
 
-# Copy the built application from the builder stage
-COPY --from=builder /worker-app /worker-app
+WORKDIR /root/
 
-# Define the command to run the application
-ENTRYPOINT ["/worker-app"]
+# Copy the built binary from the builder stage
+COPY --from=builder /app/worker-app .
+
+# The command to run the worker service
+CMD ["./worker-app"]

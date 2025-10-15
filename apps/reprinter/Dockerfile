@@ -1,28 +1,31 @@
-# Dockerfile for the Go reprinter application
+# Dockerfile for the Go reprinter application (Monorepo-Aware)
 
-# Start with a Go base image for building the application
-FROM golang:1.21-alpine as builder
+# Stage 1: Build the application
+FROM golang:1.21-alpine AS builder
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the source code into the container
-COPY . .
+# Copy the Go module files from the project root
+COPY go.mod go.sum ./
 
-# Download Go module dependencies
-RUN go mod tidy
+# Download all dependencies for the monorepo
+RUN go mod download
 
-# Build the Go application
-RUN go build -o /reprinter-app .
+# Copy the source code for the reprinter application
+COPY ./apps/reprinter/ ./apps/reprinter/
 
-# Start a new, minimal stage for the final image
+# Build the reprinter application specifically
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app/reprinter-app ./apps/reprinter
+
+# Stage 2: Create the final, minimal image
 FROM alpine:latest
 
-# Set the working directory
-WORKDIR /
+RUN apk --no-cache add ca-certificates
 
-# Copy the built application from the builder stage
-COPY --from=builder /reprinter-app /reprinter-app
+WORKDIR /root/
 
-# Define the command to run the application
-ENTRYPOINT ["/reprinter-app"]
+# Copy the built binary from the builder stage
+COPY --from=builder /app/reprinter-app .
+
+# The command to run the reprinter service
+CMD ["./reprinter-app"]
