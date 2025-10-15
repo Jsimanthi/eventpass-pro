@@ -110,7 +110,7 @@ func main() {
 	authRouter.HandleFunc("/events", h.ListEvents).Methods("GET")
 	authRouter.HandleFunc("/events", h.CreateEvent).Methods("POST")
 	authRouter.HandleFunc("/events/{id}", h.GetEvent).Methods("GET")
-	authRouter.HandleFunc("//events/{id}", h.UpdateEvent).Methods("PUT")
+	authRouter.HandleFunc("/events/{id}", h.UpdateEvent).Methods("PUT")
 	authRouter.HandleFunc("/events/{id}", h.DeleteEvent).Methods("DELETE")
 	authRouter.HandleFunc("/events/{id}/invitees", h.UploadInvitees).Methods("POST")
 	authRouter.HandleFunc("/events/{id}/report", h.ExportInvitees).Methods("GET")
