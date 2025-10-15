@@ -70,6 +70,12 @@ services:
       - "8080:8080"
     environment:
       - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - RABBITMQ_URL=${RABBITMQ_URL}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+      - MINIO_ACCESS_KEY_ID=${MINIO_ACCESS_KEY_ID}
+      - MINIO_SECRET_ACCESS_KEY=${MINIO_SECRET_ACCESS_KEY}
+      - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
 
   # The Next.js frontend
   frontend:
@@ -99,6 +105,7 @@ services:
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - REPLICA_DATABASE_URL=${REPLICA_DATABASE_URL}
+      - RABBITMQ_URL=${RABBITMQ_URL}
   
   # The background reprinter for processing tasks
   reprinter:
@@ -113,6 +120,7 @@ services:
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - REPLICA_DATABASE_URL=${REPLICA_DATABASE_URL}
+      - RABBITMQ_URL=${RABBITMQ_URL}
 
 volumes:
   postgres_data:
