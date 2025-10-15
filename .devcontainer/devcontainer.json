@@ -6,12 +6,17 @@
     "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
   ],
   "postCreateCommand": "/bin/bash ./.devcontainer/post-create.sh",
-  // This setting will make all new terminals automatically use our wrapper script,
-  // which launches the nix-shell.
-  "terminal.integrated.shell.linux": "/bin/bash",
-  "terminal.integrated.shellArgs.linux": ["-c", ".devcontainer/nix-shell-wrapper.sh"],
   "customizations": {
     "vscode": {
+      "settings": {
+        // This setting will make all new terminals automatically use our wrapper script,
+        // which launches the nix-shell.
+        "terminal.integrated.shell.linux": "/bin/bash",
+        "terminal.integrated.shellArgs.linux": [
+          "-c",
+          ".devcontainer/nix-shell-wrapper.sh"
+        ]
+      },
       "extensions": [
         "golang.go"
       ]

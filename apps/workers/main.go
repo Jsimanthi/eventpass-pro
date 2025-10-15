@@ -45,7 +45,6 @@ func sync(primaryDSN, replicaDSN string) {
 			log.Printf("Error querying primary database: %v", err)
 			continue
 		}
-		defer rows.Close()
 
 		for rows.Next() {
 			var id, eventID int
@@ -76,5 +75,8 @@ func sync(primaryDSN, replicaDSN string) {
 				log.Printf("Error upserting into replica database: %v", err)
 			}
 		}
+
+		// Close the rows at the end of the iteration to prevent resource leaks.
+		rows.Close()
 	}
 }
