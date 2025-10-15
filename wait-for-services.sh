@@ -1,34 +1,35 @@
 #!/bin/sh
-# wait-for-services.sh
+# A script to wait for services to be available before executing a command.
 
 set -e
 
-# First argument is the command to execute
-CMD="$@"
-
-# Wait for each service in a loop
-# Example usage: wait-for-services.sh postgres:5432 rabbitmq:5672 -- my-command
+# Loop through service arguments until we hit the '--' separator
 while [ $# -gt 0 ]; do
-    SERVICE="$1"
-    shift
-    if [ "$SERVICE" = "--" ]; then
+    # If the argument is '--', stop processing services and break the loop.
+    if [ "$1" = '--' ]; then
+        shift # remove the '--'
         break
     fi
 
+    SERVICE="$1"
     HOST=$(echo $SERVICE | cut -d: -f1)
     PORT=$(echo $SERVICE | cut -d: -f2)
 
     echo "Waiting for $HOST:$PORT..."
 
-    # Use netcat (nc) to check if the port is open
-    # Loop until the port is open
+    # Use a loop with netcat to check for connectivity.
     until nc -z "$HOST" "$PORT"; do
         >&2 echo "$HOST:$PORT is unavailable - sleeping"
         sleep 1
     done
 
-    >&2 echo "$HOST:$PORT is up - executing command"
+    >&2 echo "$HOST:$PORT is up."
+    shift # remove the processed service argument
 done
 
-# Execute the command that was passed in
-exec $CMD
+# After the loop, the remaining arguments are the command to execute.
+# Print the command for debugging purposes.
+>&2 echo "Executing command: $@"
+
+# Execute the command.
+exec "$@"
