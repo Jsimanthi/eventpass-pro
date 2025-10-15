@@ -1,7 +1,8 @@
 # Dockerfile for the Go reprinter application (Monorepo-Aware)
 
 # Stage 1: Build the application
-FROM golang:1.21-alpine AS builder
+# Use the correct Go version as specified in go.mod
+FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 
