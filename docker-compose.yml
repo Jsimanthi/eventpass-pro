@@ -59,8 +59,7 @@ services:
   # The Go backend API
   backend:
     build:
-      context: .
-      dockerfile: ./apps/backend/Dockerfile
+      context: ./apps/backend
     restart: always
     depends_on:
       - postgres
@@ -74,8 +73,7 @@ services:
   # The Next.js frontend
   frontend:
     build:
-      context: .
-      dockerfile: ./apps/frontend/Dockerfile
+      context: ./apps/frontend
     restart: always
     depends_on:
       - backend
@@ -89,8 +87,20 @@ services:
   # The background worker for processing tasks
   worker:
     build:
-      context: .
-      dockerfile: ./apps/workers/Dockerfile
+      context: ./apps/workers
+    restart: always
+    depends_on:
+      - postgres
+      - replica
+      - rabbitmq
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - REPLICA_DATABASE_URL=${REPLICA_DATABASE_URL}
+  
+  # The background reprinter for processing tasks
+  reprinter:
+    build:
+      context: ./apps/reprinter
     restart: always
     depends_on:
       - postgres
