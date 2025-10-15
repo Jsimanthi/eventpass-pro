@@ -5,7 +5,7 @@
 services:
   # The primary PostgreSQL database
   postgres:
-    image: postgres:15
+    image: timescale/timescaledb:latest-pg15 # This image includes the TimescaleDB extension.
     restart: always
     environment:
       POSTGRES_DB: ${POSTGRES_DB}

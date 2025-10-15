@@ -48,3 +48,10 @@ CREATE TABLE orders (
     deleted_at TIMESTAMPTZ, 
     anonymized_at TIMESTAMPTZ
 );
+
+-- This table was missing. It is used for analytics.
+CREATE TABLE check_ins (
+    id SERIAL PRIMARY KEY,
+    invitee_id INTEGER NOT NULL REFERENCES invitees(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
