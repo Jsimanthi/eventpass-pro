@@ -40,7 +40,6 @@ services:
       - LIBSQL_SQLITE_TRACE=1
     volumes:
       - libsql_data:/var/lib/libsql/data
-    command: libsql-server --http-listen-addr 0.0.0.0:8080
 
   # Minio for S3-compatible object storage
   minio:

@@ -30,7 +30,7 @@ func createContinuousAggregates(pool *pgxpool.Pool) {
 		CREATE MATERIALIZED VIEW IF NOT EXISTS hourly_check_ins
 		WITH (timescaledb.continuous) AS
 		SELECT
-			time_bucket(INTERVAL '1 hour', created_at) AS hour,
+			time_bucket(INTERVAL '1 hour', checked_in_at) AS hour,
 			COUNT(*) AS check_in_count
 		FROM check_ins
 		GROUP BY hour;
@@ -61,7 +61,7 @@ func createContinuousAggregates(pool *pgxpool.Pool) {
 		CREATE MATERIALIZED VIEW IF NOT EXISTS daily_check_ins
 		WITH (timescaledb.continuous) AS
 		SELECT
-			time_bucket(INTERVAL '1 day', created_at) AS day,
+			time_bucket(INTERVAL '1 day', checked_in_at) AS day,
 			COUNT(*) AS check_in_count
 		FROM check_ins
 		GROUP BY day;

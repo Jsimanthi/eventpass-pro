@@ -1,4 +1,4 @@
-DB_URL=postgres://user:password@localhost:5432/eventpass_dev?sslmode=disable
+DB_URL=postgres://eventpass_user:your_secure_password_here@postgres:5432/eventpass_pro?sslmode=disable
 
 migrate-up:
 	migrate -path db/migrations -database "$(DB_URL)" up
