@@ -21,6 +21,9 @@ FROM nginx:stable-alpine
 # Copy the built static files from the builder stage
 COPY --from=builder /app/apps/frontend/dist /usr/share/nginx/html
 
-EXPOSE 80
+# Copy the custom Nginx configuration
+COPY ./apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 3000
 
 CMD ["nginx", "-g", "daemon off;"]
