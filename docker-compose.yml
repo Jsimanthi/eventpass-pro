@@ -170,7 +170,7 @@ services:
       - elasticsearch_data:/usr/share/elasticsearch/data
 
   fluentd:
-    image: fluentd:v1.16
+    image: fluent/fluentd:v1.16-debian-1
     ports:
       - '24224:24224'
       - '24224:24224/udp'
