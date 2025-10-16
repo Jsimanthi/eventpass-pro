@@ -28,7 +28,8 @@ func createContinuousAggregates(pool *pgxpool.Pool) {
 		SELECT add_continuous_aggregate_policy('hourly_check_ins',
 			start_offset => INTERVAL '3 hour',
 			end_offset => INTERVAL '1 hour',
-			schedule_interval => INTERVAL '1 hour');
+			schedule_interval => INTERVAL '1 hour',
+			if_not_exists => true);
 	`)
 	if err != nil {
 		// Check if the error is a "duplicate object" error (code 42710). If so, it's safe to ignore.
@@ -58,7 +59,8 @@ func createContinuousAggregates(pool *pgxpool.Pool) {
 		SELECT add_continuous_aggregate_policy('daily_check_ins',
 			start_offset => INTERVAL '3 day',
 			end_offset => INTERVAL '1 day',
-			schedule_interval => INTERVAL '1 day');
+			schedule_interval => INTERVAL '1 day',
+			if_not_exists => true);
 	`)
 	if err != nil {
 		// Check if the error is a "duplicate object" error (code 42710). If so, it's safe to ignore.
