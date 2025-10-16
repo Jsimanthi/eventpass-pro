@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import EventForm from './EventForm';
 import InviteeList from './InviteeList';
+import InviteeUpload from './InviteeUpload';
 
 interface Event {
   id: number;
@@ -16,6 +17,7 @@ const EventList: React.FC = () => {
   const [editingEvent, setEditingEvent] = useState<Event | undefined>(undefined);
   const [showForm, setShowForm] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
+  const [showUpload, setShowUpload] = useState(false);
 
   const fetchEvents = async () => {
     try {
@@ -94,19 +96,26 @@ const EventList: React.FC = () => {
     setEditingEvent(event);
     setShowForm(true);
     setSelectedEventId(null);
+    setShowUpload(false);
   };
 
   const handleAddNew = () => {
     setEditingEvent(undefined);
     setShowForm(true);
     setSelectedEventId(null);
+    setShowUpload(false);
   }
 
   const handleSelectEvent = (eventId: number) => {
     setSelectedEventId(selectedEventId === eventId ? null : eventId);
     setShowForm(false);
     setEditingEvent(undefined);
+    setShowUpload(false);
   };
+  
+  const handleShowUpload = () => {
+    setShowUpload(!showUpload);
+  }
 
   if (error) {
     return <div>Error: {error.message}</div>;
@@ -149,7 +158,13 @@ const EventList: React.FC = () => {
           ))}
         </tbody>
       </table>
-      {selectedEventId && <InviteeList eventId={selectedEventId} />}
+      {selectedEventId && (
+        <div>
+          <button onClick={handleShowUpload}>Upload Invitees</button>
+          {showUpload && <InviteeUpload eventId={selectedEventId} />}
+          <InviteeList eventId={selectedEventId} />
+        </div>
+      )}
     </div>
   );
 };

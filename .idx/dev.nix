@@ -15,6 +15,7 @@
     pkgs.go # For the Go backend
     pkgs.nodejs_20 # For the Node.js frontend
     pkgs.sqlc # For generating database code
+    pkgs.playwright # For Playwright end-to-end testing
   ];
 
   # A set of environment variables to define within the workspace.

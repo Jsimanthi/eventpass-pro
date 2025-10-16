@@ -14,6 +14,8 @@ interface InviteeListProps {
 const InviteeList: React.FC<InviteeListProps> = ({ eventId }) => {
   const [invitees, setInvitees] = useState<Invitee[]>([]);
   const [error, setError] = useState<Error | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
 
   useEffect(() => {
     const fetchInvitees = async () => {
@@ -41,6 +43,13 @@ const InviteeList: React.FC<InviteeListProps> = ({ eventId }) => {
     }
   }, [eventId]);
 
+  const filteredInvitees = invitees.filter(invitee => {
+    return (
+      invitee.email.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (statusFilter === '' || invitee.status === statusFilter)
+    );
+  });
+
   if (error) {
     return <div>Error: {error.message}</div>;
   }
@@ -48,6 +57,21 @@ const InviteeList: React.FC<InviteeListProps> = ({ eventId }) => {
   return (
     <div>
       <h3>Invitees</h3>
+      <div>
+        <input
+          type="text"
+          placeholder="Search by email"
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+        />
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+          <option value="">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="checked_in">Checked In</option>
+          <option value="expired">Expired</option>
+          <option value="denied">Denied</option>
+        </select>
+      </div>
       <table>
         <thead>
           <tr>
@@ -58,7 +82,7 @@ const InviteeList: React.FC<InviteeListProps> = ({ eventId }) => {
           </tr>
         </thead>
         <tbody>
-          {invitees.map(invitee => (
+          {filteredInvitees.map(invitee => (
             <tr key={invitee.id}>
               <td>{invitee.id}</td>
               <td>{invitee.email}</td>

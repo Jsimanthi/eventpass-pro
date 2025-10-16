@@ -1,0 +1,32 @@
+.job-list {
+  list-style: none;
+  padding: 0;
+}
+
+.job-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.job-item:last-child {
+  border-bottom: none;
+}
+
+.status-queued {
+  background-color: #f0f0f0;
+}
+
+.status-processing {
+  background-color: #e6f7ff;
+}
+
+.status-completed {
+  background-color: #f6ffed;
+}
+
+.status-failed {
+  background-color: #fff1f0;
+}
