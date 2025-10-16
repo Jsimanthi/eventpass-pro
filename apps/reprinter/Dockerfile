@@ -17,7 +17,7 @@ COPY . .
 RUN go build -o /app/reprinter ./apps/reprinter
 
 # Copy the wait script
-COPY wait-for-services.sh /usr/local/bin/
+COPY infra/scripts/wait-for-services.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/wait-for-services.sh
 
 # The command to run the application (will be overridden in docker-compose.yml)
