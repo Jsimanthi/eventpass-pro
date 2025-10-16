@@ -91,7 +91,7 @@ services:
       - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
     command: ["wait-for-services.sh", "postgres:5432", "rabbitmq:5672", "redis:6379", "--", "/app/backend"]
 
-  # The Next.js frontend
+  # The React/Vite frontend
   frontend:
     build:
       context: .
@@ -102,9 +102,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NEXTAUTH_URL=${NEXTAUTH_URL}
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
-      - NEXT_PUBLIC_API_URL=http://backend:8080 # Tells the frontend how to reach the backend inside the Docker network
+      - VITE_API_URL=http://localhost:8080
 
   # The background worker for processing tasks
   worker:

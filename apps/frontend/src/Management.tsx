@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import EventList from './EventList';
 
+declare global {
+  interface ImportMeta {
+    env: {
+      VITE_API_URL?: string;
+    };
+  }
+}
+
 interface CheckIn {
   email: string;
   gift_claimed_at: string;
@@ -18,7 +26,8 @@ const Management: React.FC = () => {
   const fetchCheckIns = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/events', {
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      const response = await fetch(`${baseUrl}/api/events`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
@@ -35,7 +44,8 @@ const Management: React.FC = () => {
       const allCheckIns: CheckIn[] = [];
       for (const event of events) {
         try {
-          const inviteesResponse = await fetch(`/api/events/${event.id}/invitees`, {
+          const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+          const inviteesResponse = await fetch(`${baseUrl}/api/events/${event.id}/invitees`, {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`,
               'Content-Type': 'application/json'

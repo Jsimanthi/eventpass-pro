@@ -4,6 +4,14 @@ interface InviteeUploadProps {
   eventId: number;
 }
 
+declare global {
+  interface ImportMeta {
+    env: {
+      VITE_API_URL?: string;
+    };
+  }
+}
+
 const InviteeUpload: React.FC<InviteeUploadProps> = ({ eventId }) => {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState('');
@@ -24,7 +32,8 @@ const InviteeUpload: React.FC<InviteeUploadProps> = ({ eventId }) => {
     formData.append('file', file);
 
     try {
-      const response = await fetch(`/api/events/${eventId}/invitees`,
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      const response = await fetch(`${baseUrl}/api/events/${eventId}/invitees`,
         {
           method: 'POST',
           headers: {

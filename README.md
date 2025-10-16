@@ -1,53 +1,32 @@
-# 🚀 EventPass Pro
+# EventPass Pro
 
-A world-class, enterprise-grade event management system built with modern technologies and best practices. This monorepo contains a complete event management platform with advanced features like real-time analytics, QR code management, GDPR compliance, and comprehensive monitoring.
+A comprehensive event management system with QR code check-ins, real-time analytics, and GDPR compliance.
 
-## 🌟 Features
+## Features
 
-### Core Functionality
-- **Event Management**: Create, update, and manage events with full CRUD operations
-- **Invitee Management**: Upload invitees via CSV, generate secure QR codes with HMAC signatures
-- **Real-time Check-ins**: QR code scanning with duplicate prevention and live WebSocket updates
-- **Gift Management**: Single-claim gift system with atomic operations
-- **User Authentication**: JWT-based auth with bcrypt password hashing
+### ✅ Core Features
+- **Event Management**: Create, update, and manage events
+- **QR Code Generation**: Secure QR codes with HMAC signatures for invitee validation
+- **Real-time Check-ins**: WebSocket-based live check-in monitoring
+- **User Authentication**: JWT-based authentication with bcrypt password hashing
+- **GDPR Compliance**: Data anonymization and privacy controls
+- **File Storage**: MinIO S3-compatible storage for QR codes
+- **Background Processing**: RabbitMQ for notifications and message queuing
+- **Caching**: Redis for performance optimization
+- **Analytics**: TimescaleDB for time-series analytics
+- **Monitoring**: Prometheus metrics and Grafana dashboards
 
-### Advanced Features
-- **Real-time Dashboard**: Live check-in monitoring with WebSocket integration and data visualization
-- **GDPR Compliance**: Complete data anonymization and audit trails
-- **Multi-tenant Architecture**: Secure tenant isolation with RBAC
-- **Background Processing**: RabbitMQ-based workers for high-concurrency operations
-- **Database Replication**: Read replica support for scaling
+### ✅ Infrastructure
+- **Docker Compose**: Complete containerized deployment
+- **Database Replication**: Primary-replica PostgreSQL setup
+- **Load Balancing**: Nginx reverse proxy configuration
+- **Logging**: Elasticsearch and FluentD integration
+- **Health Monitoring**: Comprehensive logging and metrics
 
-### Enterprise Infrastructure
-- **Comprehensive Monitoring**: Prometheus metrics, Grafana dashboards, and alerting
-- **Centralized Logging**: Elasticsearch + Fluentd for log aggregation
-- **Object Storage**: MinIO for QR code storage and management
-- **Time-series Analytics**: TimescaleDB for historical data and trends
-- **TLS Encryption**: Production-ready HTTPS with self-signed certificates
-
-## 🏗️ Architecture
-
-This is a sophisticated monorepo with the following structure:
-
-```
-eventpass-pro/
-├── apps/
-│   ├── backend/          # Go (Gin) API server
-│   ├── frontend/         # React + TypeScript SPA
-│   ├── workers/          # Background job processors
-│   └── reprinter/        # QR code regeneration service
-├── packages/
-│   └── ai-memory/        # AI project tracking and memory management
-├── monitoring/           # Prometheus, Grafana, logging configs
-└── infra/               # Docker, scripts, and deployment configs
-```
-
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Docker and Docker Compose
-- Go 1.21+
-- Node.js 18+
 - Git
 
 ### 1. Clone and Setup
@@ -56,122 +35,120 @@ git clone <repository-url>
 cd eventpass-pro
 ```
 
-### 2. Environment Configuration
+### 2. Configure Environment
 ```bash
 cp .env.example .env
-# Edit .env with your configuration
+# Edit .env with your preferred settings
 ```
 
-### 3. Start All Services
+### 3. Start the Application
 ```bash
-# Start the complete infrastructure stack
-docker-compose up -d
+# Start all services
+docker-compose up --build
 
-# The following services will be available:
-# - PostgreSQL + TimescaleDB (port 5432)
-# - Redis (port 6379)
-# - RabbitMQ (ports 5672, 15672)
-# - MinIO (ports 9000, 9001)
-# - Prometheus (port 9090)
-# - Grafana (port 3001)
-# - Elasticsearch (port 9200)
-# - Fluentd (port 24224)
+# Or run in background
+docker-compose up -d --build
 ```
 
-### 4. Run Database Migrations
+### 4. Access the Application
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8080
+- **Grafana**: http://localhost:3001 (admin/admin)
+- **MinIO Console**: http://localhost:9001 (minioadmin/minioadminpassword)
+
+## Development
+
+### Backend Development
 ```bash
-# Apply all database migrations
-cd apps/backend
-go run main.go migrate up
+# Run backend only
+docker-compose up backend --build
+
+# View logs
+docker-compose logs -f backend
 ```
 
-### 5. Start Backend Services
-```bash
-# Terminal 1: Start the main API server
-cd apps/backend
-go run main.go
-
-# Terminal 2: Start background workers
-cd apps/workers
-go run main.go
-
-# Terminal 3: Start QR reprinter service
-cd apps/reprinter
-go run main.go
-```
-
-### 6. Start Frontend Development Server
+### Frontend Development
 ```bash
 cd apps/frontend
-npm install
 npm run dev
 ```
 
-## 🌐 Access Points
+### Database Migrations
+```bash
+# Run migrations
+docker-compose exec postgres psql -U eventpass_user -d eventpass_pro -f /path/to/migration.sql
+```
 
-Once everything is running, you can access:
+## API Endpoints
 
-- **Frontend**: http://localhost:3000
-- **Backend API**: https://localhost:8080
-- **Grafana**: http://localhost:3001 (admin/admin)
-- **MinIO Console**: http://localhost:9001 (minioadmin/minioadminpassword)
-- **RabbitMQ Management**: http://localhost:15672 (user/password)
+### Public Endpoints
+- `POST /users` - Create user
+- `POST /login` - User login
+- `GET /validate` - Validate invitee QR code
+- `GET /qrcodes/{objectName}` - Serve QR code images
+- `POST /scan/{qr}` - Scan QR code for check-in
 
-## 🔐 Default Credentials
+### Authenticated Endpoints
+- `GET /events` - List events
+- `POST /events` - Create event
+- `GET /events/{id}` - Get event details
+- `PUT /events/{id}` - Update event
+- `DELETE /events/{id}` - Delete event
+- `GET /events/{id}/invitees` - List invitees
+- `POST /events/{id}/invitees` - Upload invitees (CSV)
+- `GET /events/{id}/report` - Export invitees report
+- `POST /invitees/{invitee_id}/reprint` - Request reprint
+- `POST /users/{id}/anonymize` - Anonymize user data
+- `POST /invitees/{id}/anonymize` - Anonymize invitee data
+- `POST /orders/{id}/anonymize` - Anonymize order data
 
-- **Frontend Login**:
-  - Email: `admin@eventpass.pro`
-  - Password: `password`
+## Architecture
 
-- **Grafana**: `admin` / `admin`
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Frontend      │    │   Backend       │    │   Database      │
+│   (React/Vite)  │◄──►│   (Go/Gorilla)  │◄──►│   (PostgreSQL)  │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   WebSocket     │    │     Redis       │    │   TimescaleDB   │
+│   (Real-time)   │    │   (Caching)     │    │   (Analytics)   │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   RabbitMQ      │    │     MinIO       │    │   Elasticsearch │
+│ (Notifications) │    │   (Storage)     │    │   (Logging)     │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
 
-## 📊 Monitoring & Observability
+## Security Features
 
-The system includes comprehensive monitoring:
-
-- **Metrics**: Prometheus collects metrics from all services
-- **Dashboards**: Pre-configured Grafana dashboards for system overview, business metrics, and API performance
-- **Alerting**: Prometheus alerting rules for critical system events
-- **Logging**: Centralized logging with Elasticsearch and Fluentd
-
-## 🔧 Development
-
-### Project Structure
-- **Backend**: Go with Gin framework, sqlc for type-safe SQL queries
-- **Frontend**: React 18 with TypeScript, Vite for building
-- **Database**: PostgreSQL with TimescaleDB extension for time-series data
-- **Message Queue**: RabbitMQ for reliable background processing
-- **Cache/Session Store**: Redis for performance optimization
-- **Object Storage**: MinIO for file/Qr code storage
-
-### Key Technologies
-- **Backend**: Go, Gin, PostgreSQL, Redis, RabbitMQ, MinIO
-- **Frontend**: React, TypeScript, Vite, WebSocket, Chart.js
-- **Infrastructure**: Docker, Prometheus, Grafana, Elasticsearch
-- **Security**: JWT, bcrypt, HMAC, TLS, GDPR compliance
-
-## 🚀 Production Deployment
-
-This system is production-ready with:
-
-- **Multi-stage Dockerfiles** for optimized images
-- **Health checks** and proper service dependencies
-- **Environment-based configuration**
-- **Comprehensive logging and monitoring**
-- **Security hardening** with TLS and rate limiting
+- **HMAC-signed QR codes** for tamper-proof validation
+- **JWT authentication** with secure token management
+- **bcrypt password hashing** for user credentials
+- **CORS protection** with configurable origins
+- **Rate limiting** for API endpoints
 - **GDPR compliance** with data anonymization
+- **TLS/SSL support** for secure communications
 
-## 🤝 Contributing
+## Monitoring
 
-1. Follow the established patterns in the codebase
-2. Add tests for new functionality
-3. Update documentation as needed
-4. Ensure all services build and tests pass
+- **Prometheus** metrics collection
+- **Grafana** dashboards for visualization
+- **Elasticsearch** log aggregation
+- **FluentD** log forwarding
+- **Health checks** for all services
 
-## 📝 License
+## Contributing
 
-This project is proprietary software. All rights reserved.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
----
+## License
 
-**EventPass Pro** - Enterprise Event Management Redefined 🎯
+ISC License - see LICENSE file for details.

@@ -3,13 +3,23 @@ import useWebSocket from './hooks/useWebSocket';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './Live.css';
 
+declare global {
+  interface ImportMeta {
+    env: {
+      VITE_API_URL?: string;
+    };
+  }
+}
+
 interface CheckIn {
   email: string;
   gift_claimed_at: string;
 }
 
 const Live: React.FC = () => {
-  const checkIns = useWebSocket<CheckIn>(`wss://localhost:8080/ws`);
+  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+  const wsUrl = baseUrl.replace('http', 'ws') + '/ws';
+  const checkIns = useWebSocket<CheckIn>(wsUrl);
 
   const chartData = useMemo(() => {
     const data: { [key: string]: number } = {};
