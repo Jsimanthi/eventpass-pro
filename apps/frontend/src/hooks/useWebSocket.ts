@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 
-const useWebSocket = (url: string) => {
-  const [messages, setMessages] = useState<any[]>([]);
+const useWebSocket = <T>(url: string) => {
+  const [messages, setMessages] = useState<T[]>([]);
   const webSocketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
@@ -12,7 +12,7 @@ const useWebSocket = (url: string) => {
     };
 
     webSocketRef.current.onmessage = (event) => {
-      const message = JSON.parse(event.data);
+      const message = JSON.parse(event.data) as T;
       setMessages((prevMessages) => [...prevMessages, message]);
     };
 

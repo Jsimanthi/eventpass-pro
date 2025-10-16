@@ -34,8 +34,7 @@
     workspace = {
       # Runs when a workspace is first created.
       onCreate = {
-        # Example: install dependencies
-        # npm-install = "npm install";
+        npm-install = "npm install --prefix apps/frontend";
       };
 
       # Runs every time the workspace is (re)started.
