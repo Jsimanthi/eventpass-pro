@@ -22,6 +22,7 @@ CREATE TABLE invitees (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     qr_code TEXT,
+    qr_code_url TEXT,
     hmac_signature TEXT,
     state VARCHAR(255) NOT NULL DEFAULT 'invited',
     gift_claimed_at TIMESTAMP,
