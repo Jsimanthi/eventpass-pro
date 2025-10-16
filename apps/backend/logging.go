@@ -267,9 +267,9 @@ func requestLoggingMiddleware(next http.Handler) http.Handler {
 }
 
 // Helper function to extract user ID from request context
-func getUserIDFromRequest(ctx context.Context, r *http.Request) string {
+func getUserIDFromRequest(ctx context.Context, _ *http.Request) string {
 	// Try to get user from context (set by auth middleware)
-	if user, ok := ctx.Value("user").(db.User); ok {
+	if user, ok := ctx.Value(userContextKey).(db.User); ok {
 		if user.ID.Valid {
 			return uuid.UUID(user.ID.Bytes).String()
 		}

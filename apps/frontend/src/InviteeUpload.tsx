@@ -24,7 +24,7 @@ const InviteeUpload: React.FC<InviteeUploadProps> = ({ eventId }) => {
     formData.append('file', file);
 
     try {
-      const response = await fetch(`/api/events/${eventId}/invitees/upload`,
+      const response = await fetch(`/api/events/${eventId}/invitees`,
         {
           method: 'POST',
           headers: {

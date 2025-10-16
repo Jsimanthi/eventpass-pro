@@ -42,3 +42,34 @@ vendor/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Test and build artifacts
+test-results/
+playwright-report/
+*.log
+coverage/
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Logs
+logs/
+*.log
+
+# Temporary folders
+tmp/
+temp/
+
+# Database files
+*.db
+*.sqlite
+
+# TLS certificates (for development)
+*.pem

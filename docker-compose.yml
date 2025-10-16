@@ -16,7 +16,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       # This line is new. It mounts the schema file into the Postgres init directory.
-      - ./db/schema.sql:/docker-entrypoint-initdb.d/init.sql
 
   # The read-replica PostgreSQL database
   replica:
@@ -30,6 +29,18 @@ services:
       - '5433:5432' # Expose on a different host port to avoid conflicts
     volumes:
       - replica_data:/var/lib/postgresql/data
+
+  # LibSQL for fallback database
+  libsql:
+    image: ghcr.io/tursodatabase/libsql-server:latest
+    restart: always
+    ports:
+      - '8081:8080' # LibSQL HTTP API port
+    environment:
+      - LIBSQL_SQLITE_TRACE=1
+    volumes:
+      - libsql_data:/var/lib/libsql/data
+    command: libsql-server --http-listen-addr 0.0.0.0:8080
 
   # Minio for S3-compatible object storage
   minio:
@@ -174,3 +185,4 @@ volumes:
   postgres_data:
   replica_data:
   elasticsearch_data:
+  libsql_data:

@@ -14,12 +14,19 @@
   "dependencies": {
     "@google/generative-ai": "^0.1.0",
     "@testing-library/jest-dom": "^6.9.1",
+    "@types/react-router-dom": "^5.3.3",
     "axios": "^1.12.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-qr-scanner": "^1.0.0-alpha.11",
+    "react-router-dom": "^6.8.0",
     "recharts": "^2.15.4",
     "vite": "^5.2.11"
   },
   "devDependencies": {
-    "@types/recharts": "^1.8.29"
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@types/recharts": "^1.8.29",
+    "@vitejs/plugin-react": "^5.0.4"
   }
 }

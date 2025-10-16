@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import Live from './Live';
-import Management from './Management';
-import Login from './Login';
-import Registration from './Registration';
-import ReprintRequests from './ReprintRequests';
-import UserManagement from './UserManagement';
-import QueueMonitoring from './QueueMonitoring';
-import PrivacyControls from './PrivacyControls';
+
+// Lazy load components for code splitting
+const Live = lazy(() => import('./Live'));
+const Management = lazy(() => import('./Management'));
+const Login = lazy(() => import('./Login'));
+const Registration = lazy(() => import('./Registration'));
+const ReprintRequests = lazy(() => import('./ReprintRequests'));
+const UserManagement = lazy(() => import('./UserManagement'));
+const QueueMonitoring = lazy(() => import('./QueueMonitoring'));
+const PrivacyControls = lazy(() => import('./PrivacyControls'));
+const Scan = lazy(() => import('./Scan'));
+
+// Eager load critical components
 import PrivateRoute from './PrivateRoute';
-import Scan from './Scan';
 
 const App: React.FC = () => {
   const handleLogout = () => {
@@ -57,38 +61,40 @@ const App: React.FC = () => {
 
         <hr />
 
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Registration />} />
-          <Route
-            path="/live"
-            element={<PrivateRoute><Live /></PrivateRoute>}
-          />
-          <Route
-            path="/management"
-            element={<PrivateRoute><Management /></PrivateRoute>}
-          />
-          <Route
-            path="/reprint-requests"
-            element={<PrivateRoute><ReprintRequests /></PrivateRoute>}
-          />
-          <Route
-            path="/user-management"
-            element={<PrivateRoute><UserManagement /></PrivateRoute>}
-          />
-          <Route
-            path="/queue-monitoring"
-            element={<PrivateRoute><QueueMonitoring /></PrivateRoute>}
-          />
-          <Route
-            path="/privacy-controls"
-            element={<PrivateRoute><PrivacyControls /></PrivateRoute>}
-          />
-          <Route
-            path="/scan"
-            element={<PrivateRoute><Scan /></PrivateRoute>}
-          />
-        </Routes>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Registration />} />
+            <Route
+              path="/live"
+              element={<PrivateRoute><Live /></PrivateRoute>}
+            />
+            <Route
+              path="/management"
+              element={<PrivateRoute><Management /></PrivateRoute>}
+            />
+            <Route
+              path="/reprint-requests"
+              element={<PrivateRoute><ReprintRequests /></PrivateRoute>}
+            />
+            <Route
+              path="/user-management"
+              element={<PrivateRoute><UserManagement /></PrivateRoute>}
+            />
+            <Route
+              path="/queue-monitoring"
+              element={<PrivateRoute><QueueMonitoring /></PrivateRoute>}
+            />
+            <Route
+              path="/privacy-controls"
+              element={<PrivateRoute><PrivacyControls /></PrivateRoute>}
+            />
+            <Route
+              path="/scan"
+              element={<PrivateRoute><Scan /></PrivateRoute>}
+            />
+          </Routes>
+        </Suspense>
       </div>
     </Router>
   );

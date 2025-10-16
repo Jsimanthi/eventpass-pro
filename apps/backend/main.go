@@ -58,6 +58,10 @@ func main() {
 	LogInfo(context.Background(), "Database connection established successfully")
 	queries := db.New(pool)
 
+	// Initialize TimescaleDB continuous aggregates for analytics
+	createContinuousAggregates(pool)
+	LogInfo(context.Background(), "TimescaleDB continuous aggregates initialized")
+
 	// MinIO client initialization
 	endpoint := os.Getenv("MINIO_ENDPOINT")
 	accessKeyID := os.Getenv("MINIO_ACCESS_KEY_ID")
@@ -127,6 +131,7 @@ func main() {
 
 	api.StartInviteeExpirationCron()
 	api.StartOrderExpirationCron()
+	api.StartNotificationWorker()
 
 	// Initialize logging system
 	logConfig := LogConfig{
@@ -313,9 +318,17 @@ func (api *API) ScanQRCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Send gift claim notification if gift was claimed
+	if updatedInvitee.GiftClaimedAt.Valid {
+		api.SendGiftClaimNotification(ctx, updatedInvitee)
+	}
+
 	LogQRCodeScan(ctx, qr, "success", invitee.EventID)
 	RecordCheckIn(invitee.EventID)
 	RecordQRCodeScan("success")
+
+	// Send check-in notification
+	api.SendCheckInNotification(ctx, updatedInvitee)
 
 	payload, err := json.Marshal(updatedInvitee)
 	if err != nil {

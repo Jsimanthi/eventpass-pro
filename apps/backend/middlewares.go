@@ -2,11 +2,9 @@ package main
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"strings"
-	"time"
 
 	"eventpass.pro/apps/backend/db"
 	"github.com/golang-jwt/jwt/v5"
@@ -14,39 +12,8 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func loggingMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-		next.ServeHTTP(w, r)
-		log.Printf("%s %s %s", r.Method, r.RequestURI, time.Since(start))
-	})
-}
-
-func rateLimitMiddleware(next http.Handler) http.Handler {
-	// A simple in-memory rate limiter.
-	// In a real application, you would use a more robust solution like Redis.
-	var (
-		requests = make(map[string]int)
-		last     = make(map[string]time.Time)
-	)
-
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ip := r.RemoteAddr
-		if last[ip].IsZero() || time.Since(last[ip]) > 1*time.Minute {
-			last[ip] = time.Now()
-			requests[ip] = 0
-		}
-
-		requests[ip]++
-
-		if requests[ip] > 100 { // 100 requests per minute
-			http.Error(w, "Too many requests", http.StatusTooManyRequests)
-			return
-		}
-
-		next.ServeHTTP(w, r)
-	})
-}
+// Use the existing contextKey type from logging.go
+const userContextKey contextKey = "user"
 
 func authMiddleware(queries *db.Queries) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
@@ -98,7 +65,7 @@ func authMiddleware(queries *db.Queries) func(http.Handler) http.Handler {
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), "user", user)
+			ctx := context.WithValue(r.Context(), userContextKey, user)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
