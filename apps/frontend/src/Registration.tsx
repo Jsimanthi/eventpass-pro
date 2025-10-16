@@ -8,7 +8,7 @@ const Registration: React.FC = () => {
 
   const handleRegistration = async () => {
     try {
-      const response = await axios.post('/register', {
+      const response = await axios.post('/api/users', {
         email,
         password,
       });

@@ -36,6 +36,11 @@ func createContinuousAggregates(pool *pgxpool.Pool) {
 		GROUP BY hour;
 	`)
 	if err != nil {
+		// Check if the error is because the check_ins table doesn't exist yet
+		if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code == "42P01" {
+			log.Printf("Warning: check_ins table doesn't exist yet, skipping materialized view creation for now")
+			return
+		}
 		log.Fatalf("Failed to create hourly_check_ins materialized view: %v", err)
 	}
 
