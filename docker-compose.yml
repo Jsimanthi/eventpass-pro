@@ -127,6 +127,27 @@ services:
       - RABBITMQ_URL=${RABBITMQ_URL}
     command: ["wait-for-services.sh", "postgres:5432", "rabbitmq:5672", "--", "/app/reprinter"]
 
+  # Prometheus for metrics collection
+  prometheus:
+    image: prom/prometheus:v2.44.0
+    restart: always
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command: --config.file=/etc/prometheus/prometheus.yml
+    ports:
+      - '9090:9090'
+
+  # Grafana for metrics visualization
+  grafana:
+    image: grafana/grafana:10.2.2
+    restart: always
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - '3001:3000'
+
 volumes:
   postgres_data:
   replica_data:

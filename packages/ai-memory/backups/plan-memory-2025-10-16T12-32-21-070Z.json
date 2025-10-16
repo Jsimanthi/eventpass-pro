@@ -2,7 +2,7 @@
   "project": "EventPass Pro",
   "version": "1.0",
   "current_phase": 4,
-  "current_step": "4.5",
+  "current_step": "4.4",
   "status": "in-progress",
   "history": [
     {
@@ -132,12 +132,6 @@
       "status": "done",
       "timestamp": "2025-10-16T12:32:21.059Z",
       "confirmed_by": "user"
-    },
-    {
-      "step": "4.4",
-      "status": "done",
-      "timestamp": "2025-10-16T12:33:33.537Z",
-      "confirmed_by": "user"
     }
   ],
   "phases": {
@@ -249,7 +243,7 @@
         },
         "4.4": {
           "title": "Production-Ready Deployment: CI/CD Pipeline",
-          "status": "done"
+          "status": "pending"
         },
         "4.5": {
           "title": "Monitoring and Analytics: Prometheus and Grafana",

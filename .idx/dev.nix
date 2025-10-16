@@ -7,7 +7,7 @@
   ... 
 }: {
   # The channel determines which package versions are available.
-  channel = "stable-24.05"; # You can also use "unstable"
+  channel = "unstable"; # Using unstable for more up-to-date packages
 
   # A list of packages to install from the specified channel.
   # You can search for packages on the NixOS package search: https://search.nixos.org/packages
@@ -15,7 +15,8 @@
     pkgs.go # For the Go backend
     pkgs.nodejs_20 # For the Node.js frontend
     pkgs.sqlc # For generating database code
-    pkgs.playwright # For Playwright end-to-end testing
+    (pkgs.playwright.withBrowsers) # For Playwright with all browser dependencies
+    pkgs.docker-compose # For running the backend services
   ];
 
   # A set of environment variables to define within the workspace.
