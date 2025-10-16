@@ -20,7 +20,7 @@ RETURNING *;
 -- name: UpdateInvitee :one
 UPDATE invitees
 SET
-  qr_code_url = $2,
+  qr_code = $2,
   hmac_signature = $3
 WHERE id = $1
 RETURNING *;
@@ -59,4 +59,4 @@ WHERE id = $1
 RETURNING *;
 
 -- name: AnonymizeInvitee :exec
-UPDATE invitees SET email = 'anonymized', qr_code_url = NULL, hmac_signature = NULL, deleted_at = NOW(), anonymized_at = NOW() WHERE id = $1;
+UPDATE invitees SET email = 'anonymized', qr_code = NULL, hmac_signature = NULL, deleted_at = NOW(), anonymized_at = NOW() WHERE id = $1;
