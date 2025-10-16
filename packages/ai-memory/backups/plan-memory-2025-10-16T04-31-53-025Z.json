@@ -2,7 +2,7 @@
   "project": "EventPass Pro",
   "version": "1.0",
   "current_phase": 1,
-  "current_step": "1.6",
+  "current_step": "1.5",
   "status": "in-progress",
   "history": [
     {
@@ -36,12 +36,6 @@
       "status": "done",
       "timestamp": "2025-10-16T04:31:53.018Z",
       "confirmed_by": "user"
-    },
-    {
-      "step": "1.5",
-      "status": "done",
-      "timestamp": "2025-10-16T04:33:46.162Z",
-      "confirmed_by": "user"
     }
   ],
   "phases": {
@@ -67,7 +61,7 @@
         },
         "1.5": {
           "title": "Event Management Dashboard: CRUD Operations",
-          "status": "done"
+          "status": "pending"
         },
         "1.6": {
           "title": "Invitee and QR Code Management: Invitee List",

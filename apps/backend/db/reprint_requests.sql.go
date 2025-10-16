@@ -15,9 +15,11 @@ const createReprintRequest = `-- name: CreateReprintRequest :one
 INSERT INTO reprint_requests (
   invitee_id,
   user_id
-) VALUES (
+)
+VALUES (
   $1, $2
-) RETURNING id, invitee_id, user_id, created_at
+)
+RETURNING id, invitee_id, user_id, created_at
 `
 
 type CreateReprintRequestParams struct {

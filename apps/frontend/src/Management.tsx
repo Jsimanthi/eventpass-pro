@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import EventList from './EventList';
 
 const Management: React.FC = () => {
   const [inviteeId, setInviteeId] = useState('');
@@ -21,14 +22,18 @@ const Management: React.FC = () => {
         const errorText = await response.text();
         setMessage(`Error: ${errorText}`);
       }
-    } catch (error) {
-      setMessage(`Error: ${error}`);
+    } catch (error: any) {
+      setMessage(`Error: ${error.message}`);
     }
   };
 
   return (
     <div>
-      <h1>Reprint Invitee QR Code</h1>
+      <h1>Management</h1>
+      
+      <hr />
+
+      <h2>Reprint Invitee QR Code</h2>
       <input
         type="text"
         placeholder="Invitee ID"
@@ -37,6 +42,10 @@ const Management: React.FC = () => {
       />
       <button onClick={handleReprint}>Reprint</button>
       {message && <p>{message}</p>}
+
+      <hr />
+
+      <EventList />
     </div>
   );
 };

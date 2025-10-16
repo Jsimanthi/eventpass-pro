@@ -163,6 +163,47 @@ func (q *Queries) GetInviteeBySignature(ctx context.Context, hmacSignature pgtyp
 	return i, err
 }
 
+const getInviteesByEvent = `-- name: GetInviteesByEvent :many
+SELECT id, event_id, email, created_at, updated_at, qr_code_url, hmac_signature, state, gift_claimed_at, expires_at, status, deleted_at, anonymized_at
+FROM invitees
+WHERE event_id = $1
+ORDER BY id
+`
+
+func (q *Queries) GetInviteesByEvent(ctx context.Context, eventID int32) ([]Invitee, error) {
+	rows, err := q.db.Query(ctx, getInviteesByEvent, eventID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Invitee
+	for rows.Next() {
+		var i Invitee
+		if err := rows.Scan(
+			&i.ID,
+			&i.EventID,
+			&i.Email,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.QrCodeUrl,
+			&i.HmacSignature,
+			&i.State,
+			&i.GiftClaimedAt,
+			&i.ExpiresAt,
+			&i.Status,
+			&i.DeletedAt,
+			&i.AnonymizedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateInvitee = `-- name: UpdateInvitee :one
 UPDATE invitees
 SET

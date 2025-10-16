@@ -4,6 +4,12 @@ FROM invitees
 WHERE id = $1
 LIMIT 1;
 
+-- name: GetInviteesByEvent :many
+SELECT *
+FROM invitees
+WHERE event_id = $1
+ORDER BY id;
+
 -- name: CreateInvitee :one
 INSERT INTO invitees (
   event_id,
@@ -20,7 +26,7 @@ RETURNING *;
 -- name: UpdateInvitee :one
 UPDATE invitees
 SET
-  qr_code = $2,
+  qr_code_url = $2,
   hmac_signature = $3
 WHERE id = $1
 RETURNING *;
@@ -59,4 +65,4 @@ WHERE id = $1
 RETURNING *;
 
 -- name: AnonymizeInvitee :exec
-UPDATE invitees SET email = 'anonymized', qr_code = NULL, hmac_signature = NULL, deleted_at = NOW(), anonymized_at = NOW() WHERE id = $1;
+UPDATE invitees SET email = 'anonymized', qr_code_url = NULL, hmac_signature = NULL, deleted_at = NOW(), anonymized_at = NOW() WHERE id = $1;

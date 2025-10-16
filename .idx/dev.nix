@@ -14,6 +14,7 @@
   packages = [
     pkgs.go # For the Go backend
     pkgs.nodejs_20 # For the Node.js frontend
+    pkgs.sqlc # For generating database code
   ];
 
   # A set of environment variables to define within the workspace.

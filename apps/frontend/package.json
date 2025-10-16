@@ -11,8 +11,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/generative-ai": "^0.1.0",
     "axios": "^1.12.2",
-    "vite": "^5.2.11",
-    "@google/generative-ai": "^0.1.0"
+    "react-qr-scanner": "^1.0.0-alpha.11",
+    "vite": "^5.2.11"
   }
 }
