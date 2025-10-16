@@ -148,6 +148,29 @@ services:
     ports:
       - '3001:3000'
 
+  # Logging services
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - '9200:9200'
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+
+  fluentd:
+    image: fluentd:v1.16
+    ports:
+      - '24224:24224'
+      - '24224:24224/udp'
+    volumes:
+      - ./monitoring/logging/fluentd-config.conf:/fluentd/etc/fluentd.conf
+    depends_on:
+      - elasticsearch
+
 volumes:
   postgres_data:
   replica_data:
+  elasticsearch_data:

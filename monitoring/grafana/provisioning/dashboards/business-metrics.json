@@ -1,0 +1,187 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "EventPass Pro - Business Metrics",
+    "tags": ["eventpass", "business"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Events Created",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "eventpass_events_created_total",
+            "legendFormat": "Total Events"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Users Registered",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "eventpass_users_registered_total",
+            "legendFormat": "Total Users"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Total Check-ins",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(eventpass_checkins_total)",
+            "legendFormat": "Total Check-ins"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "QR Code Scans",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(eventpass_qr_scans_total)",
+            "legendFormat": "Total Scans"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0}
+      },
+      {
+        "id": 5,
+        "title": "Check-ins Over Time",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(eventpass_checkins_total[5m])",
+            "legendFormat": "Check-ins per second"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps"
+          }
+        },
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8}
+      },
+      {
+        "id": 6,
+        "title": "QR Code Scan Success Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(eventpass_qr_scans_total{status=\"success\"}[5m]) / rate(eventpass_qr_scans_total[5m])",
+            "legendFormat": "Success Rate"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "max": 1,
+            "min": 0
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+      },
+      {
+        "id": 7,
+        "title": "Invitees Uploaded",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(eventpass_invitees_uploaded_total[5m])",
+            "legendFormat": "Upload Rate"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+      },
+      {
+        "id": 8,
+        "title": "Reprint Requests",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(eventpass_reprint_requests_total[5m])",
+            "legendFormat": "Reprint Rate"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+      },
+      {
+        "id": 9,
+        "title": "GDPR Anonymization Requests",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(eventpass_anonymization_requests_total[5m])",
+            "legendFormat": "{{type}} anonymizations"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+      },
+      {
+        "id": 10,
+        "title": "Top Events by Check-ins",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "sum(eventpass_checkins_total) by (event_id)",
+            "legendFormat": "{{event_id}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 32}
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "30s"
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "EventPass Pro - External Services",
+    "tags": ["eventpass", "external"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "External Services Health",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=~\"postgres|redis|rabbitmq|minio\"}",
+            "legendFormat": "{{job}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            },
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Redis Operations",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(eventpass_redis_operations_total[5m])",
+            "legendFormat": "{{operation}} - {{status}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "id": 3,
+        "title": "MinIO Operations",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(eventpass_minio_operations_total[5m])",
+            "legendFormat": "{{operation}} - {{status}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      },
+      {
+        "id": 4,
+        "title": "RabbitMQ Message Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(eventpass_rabbitmq_publishes_total[5m])",
+            "legendFormat": "{{status}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "msgps"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+      },
+      {
+        "id": 5,
+        "title": "Database Query Performance",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(eventpass_db_query_duration_seconds_bucket[5m]))",
+            "legendFormat": "95th percentile"
+          },
+          {
+            "expr": "histogram_quantile(0.50, rate(eventpass_db_query_duration_seconds_bucket[5m]))",
+            "legendFormat": "50th percentile"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+      },
+      {
+        "id": 6,
+        "title": "Database Operations by Type",
+        "type": "bargauge",
+        "targets": [
+          {
+            "expr": "rate(eventpass_db_query_duration_seconds_count[5m])",
+            "legendFormat": "{{operation}} - {{table}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops"
+          }
+        },
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 24}
+      },
+      {
+        "id": 7,
+        "title": "WebSocket Connections",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "eventpass_websocket_connections",
+            "legendFormat": "{{state}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 32}
+      },
+      {
+        "id": 8,
+        "title": "External Service Response Times",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "avg(eventpass_redis_operations_total) by (operation)",
+            "legendFormat": "Redis {{operation}}"
+          },
+          {
+            "expr": "avg(eventpass_minio_operations_total) by (operation)",
+            "legendFormat": "MinIO {{operation}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ms"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 32}
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "30s"
+  }
+}

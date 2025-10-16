@@ -1,0 +1,71 @@
+# Logrotate configuration for EventPass Pro
+
+# Backend application logs
+/var/log/eventpass/backend.log {
+    daily
+    rotate 30
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 eventpass eventpass
+    postrotate
+        # Signal application to reopen log files
+        kill -HUP $(cat /var/run/eventpass/backend.pid 2>/dev/null) 2>/dev/null || true
+    endscript
+}
+
+# Access logs
+/var/log/eventpass/access.log {
+    daily
+    rotate 90
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 eventpass eventpass
+}
+
+# Error logs
+/var/log/eventpass/error.log {
+    daily
+    rotate 90
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 eventpass eventpass
+}
+
+# Audit logs (GDPR compliance)
+/var/log/eventpass/audit.log {
+    daily
+    rotate 2555
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 eventpass eventpass
+}
+
+# Worker logs
+/var/log/eventpass/worker.log {
+    daily
+    rotate 30
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 eventpass eventpass
+}
+
+# System logs
+/var/log/eventpass/system.log {
+    weekly
+    rotate 12
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 eventpass eventpass
+}

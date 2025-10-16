@@ -1,0 +1,136 @@
+groups:
+  - name: eventpass.alerts
+    interval: 30s
+    rules:
+      # Backend API alerts
+      - alert: BackendDown
+        expr: up{job="backend"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backend API is down"
+          description: "Backend API has been down for more than 30 seconds."
+
+      - alert: BackendHighLatency
+        expr: histogram_quantile(0.95, rate(eventpass_http_request_duration_seconds_bucket[5m])) > 2
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Backend API high latency"
+          description: "Backend API 95th percentile latency is above 2 seconds for more than 2 minutes."
+
+      - alert: BackendHighErrorRate
+        expr: rate(eventpass_http_requests_total{status_code=~"5.."}[5m]) / rate(eventpass_http_requests_total[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Backend API high error rate"
+          description: "Backend API error rate is above 5% for more than 2 minutes."
+
+      # Database alerts
+      - alert: DatabaseHighLatency
+        expr: histogram_quantile(0.95, rate(eventpass_db_query_duration_seconds_bucket[5m])) > 1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database high latency"
+          description: "Database query 95th percentile latency is above 1 second for more than 2 minutes."
+
+      # Business metrics alerts
+      - alert: NoRecentCheckIns
+        expr: rate(eventpass_checkins_total[10m]) == 0
+        for: 10m
+        labels:
+          severity: info
+        annotations:
+          summary: "No recent check-ins"
+          description: "No check-ins have been recorded in the last 10 minutes."
+
+      - alert: HighQRCodeScanFailures
+        expr: rate(eventpass_qr_scans_total{status="invalid"}[5m]) / rate(eventpass_qr_scans_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High QR code scan failure rate"
+          description: "QR code scan failure rate is above 10% for more than 5 minutes."
+
+      # External service alerts
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis is down"
+          description: "Redis has been down for more than 30 seconds."
+
+      - alert: RabbitMQDown
+        expr: up{job="rabbitmq"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "RabbitMQ is down"
+          description: "RabbitMQ has been down for more than 30 seconds."
+
+      - alert: MinIODown
+        expr: up{job="minio"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "MinIO is down"
+          description: "MinIO has been down for more than 30 seconds."
+
+      # System resource alerts
+      - alert: HighMemoryUsage
+        expr: rate(eventpass_memory_usage_bytes{type="alloc"}[5m]) / rate(eventpass_memory_usage_bytes{type="sys"}[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is above 80% for more than 5 minutes."
+
+      - alert: HighGoroutineCount
+        expr: eventpass_go_routines > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High goroutine count"
+          description: "Number of goroutines is above 1000 for more than 5 minutes."
+
+      # GDPR compliance alerts
+      - alert: HighAnonymizationRequests
+        expr: rate(eventpass_anonymization_requests_total[1h]) > 10
+        for: 5m
+        labels:
+          severity: info
+        annotations:
+          summary: "High number of GDPR anonymization requests"
+          description: "More than 10 GDPR anonymization requests per hour for more than 5 minutes."
+
+      # Event management alerts
+      - alert: NoEventsCreated
+        expr: rate(eventpass_events_created_total[1h]) == 0
+        for: 1h
+        labels:
+          severity: info
+        annotations:
+          summary: "No events created recently"
+          description: "No events have been created in the last hour."
+
+      - alert: HighReprintRequests
+        expr: rate(eventpass_reprint_requests_total[15m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High number of reprint requests"
+          description: "More than 5 reprint requests per 15 minutes for more than 5 minutes."
