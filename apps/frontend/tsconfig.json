@@ -22,6 +22,7 @@
   },
   "include": [
     "src",
-    "src/setupTests.ts"
+    "src/setupTests.ts",
+    "src/types"
   ]
 }
