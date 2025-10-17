@@ -11,10 +11,13 @@ export default defineConfig({
       '/api': {
         target: 'https://localhost:8080',
         changeOrigin: true,
-        secure: true
+        secure: true,
+        agent: new (require('https').Agent)({
+          rejectUnauthorized: false
+        })
       },
       '/ws': {
-        target: 'ws://localhost:8080',
+        target: 'wss://localhost:8080',
         ws: true
       }
     }
