@@ -1,0 +1,21 @@
+{
+  "version": 1.1,
+  "properties": [
+    {
+      "name": "composes",
+      "values": [
+        {
+          "name": "class-name",
+          "description": "CSS Modules class composition"
+        }
+      ],
+      "description": "CSS Modules composes property for inheriting styles from other classes",
+      "references": [
+        {
+          "name": "CSS Modules specification",
+          "url": "https://github.com/css-modules/css-modules"
+        }
+      ]
+    }
+  ]
+}

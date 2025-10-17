@@ -99,10 +99,14 @@
 /* Progressive Enhancement */
 .progressive {
   /* Base styles for no-JS fallback */
+  opacity: 1;
+  transition: opacity 0.3s ease;
 }
 
 .jsEnabled .progressive {
   /* Enhanced styles for JavaScript environments */
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Reduced Motion Support */
@@ -211,6 +215,7 @@
 /* Accessibility Performance */
 .a11yOptimized {
   /* Optimized for screen readers */
+  position: relative;
 }
 
 /* SEO Optimization */
@@ -222,6 +227,7 @@
 /* PWA Optimization */
 .pwaOptimized {
   /* Progressive Web App support */
+  position: relative;
 }
 
 /* Dark Mode Performance */
@@ -265,20 +271,24 @@
 /* Critical Resource Hints */
 .link[rel="preload"] {
   /* Preload critical resources */
+  font-display: swap;
 }
 
 .link[rel="preconnect"] {
   /* Preconnect to external domains */
+  font-display: swap;
 }
 
 /* Service Worker Support */
 .swSupport {
   /* Styles for service worker environments */
+  position: relative;
 }
 
 /* Offline Support */
 .offlineSupport {
   /* Styles for offline environments */
+  position: relative;
 }
 
 /* Performance Budget Indicators */
