@@ -1,0 +1,334 @@
+/* Performance Optimizations */
+
+/* Critical Above-the-Fold Styles */
+.critical {
+  /* Layout stabilization */
+  contain: layout style paint;
+}
+
+/* Font Loading Optimization */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+}
+
+/* Layout Shift Prevention */
+.layoutStable {
+  min-height: var(--min-height, 0);
+  contain: layout;
+}
+
+/* Image Optimization */
+.imageOptimized {
+  aspect-ratio: var(--aspect-ratio, 16/9);
+}
+
+/* Animation Performance */
+.animationOptimized {
+  will-change: transform, opacity;
+  transform: translateZ(0); /* Force hardware acceleration */
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Container Queries for Performance */
+@container (min-width: 400px) {
+  .containerQuery {
+    flex-direction: row;
+  }
+}
+
+/* Content Visibility for Performance */
+.contentVisible {
+  content-visibility: visible;
+}
+
+.contentHidden {
+  content-visibility: hidden;
+}
+
+.contentAuto {
+  content-visibility: auto;
+  contain-intrinsic-size: 200px 50px;
+}
+
+/* Repaint and Reflow Optimization */
+.repaintOptimized {
+  contain: layout style;
+  transform: translateZ(0);
+}
+
+.reflowOptimized {
+  contain: layout;
+  table-layout: fixed;
+}
+
+/* Memory and CPU Optimization */
+.memoryOptimized {
+  contain: strict;
+  will-change: auto;
+}
+
+/* Network Performance */
+.resourceOptimized {
+  /* Optimized for loading performance */
+  font-display: swap;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Bundle Optimization */
+.bundleOptimized {
+  /* Styles that benefit from bundling */
+  isolation: isolate;
+}
+
+/* Critical Path Optimization */
+.criticalPath {
+  /* Load these styles first */
+  display: none;
+}
+
+.criticalPath:defined {
+  display: block;
+}
+
+/* Progressive Enhancement */
+.progressive {
+  /* Base styles for no-JS fallback */
+}
+
+.jsEnabled .progressive {
+  /* Enhanced styles for JavaScript environments */
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .animationOptimized,
+  .critical,
+  .layoutStable {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* High Contrast Support */
+@media (prefers-contrast: high) {
+  .critical,
+  .animationOptimized {
+    border: 2px solid;
+    outline: 2px solid;
+    outline-offset: 2px;
+  }
+}
+
+/* Print Optimization */
+@media print {
+  .critical,
+  .animationOptimized,
+  .layoutStable {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    box-shadow: none !important;
+    background: white !important;
+    color: black !important;
+  }
+}
+
+/* Performance Monitoring Classes */
+.performanceMonitor {
+  /* For performance measurement */
+  contain: layout style paint;
+}
+
+.performanceMonitor::before {
+  content: attr(data-performance);
+  position: absolute;
+  top: -20px;
+  left: 0;
+  font-size: 10px;
+  color: var(--primary-color);
+  background: var(--bg-primary);
+  padding: 2px 4px;
+  border-radius: 2px;
+  opacity: 0.7;
+}
+
+/* Loading States for Performance */
+.loadingOptimized {
+  contain: layout style;
+  aspect-ratio: var(--aspect-ratio, 1);
+  background: linear-gradient(90deg, var(--gray-200) 25%, var(--gray-100) 50%, var(--gray-200) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+/* Interaction Optimization */
+.interactionOptimized {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.interactionOptimized:active {
+  transform: scale(0.98);
+}
+
+/* Memory Management */
+.memoryManaged {
+  contain: strict;
+  will-change: auto;
+}
+
+/* CPU Optimization */
+.cpuOptimized {
+  contain: layout style;
+  transform: translateZ(0);
+}
+
+/* Network Optimization */
+.networkOptimized {
+  /* Optimize for slower connections */
+  image-rendering: optimizeSpeed;
+  font-kerning: none;
+  text-rendering: optimizeSpeed;
+}
+
+/* Battery Optimization */
+@media (prefers-reduced-motion: reduce) and (prefers-reduced-data: reduce) {
+  .batteryOptimized {
+    animation: none !important;
+    transition: none !important;
+    background: none !important;
+  }
+}
+
+/* Accessibility Performance */
+.a11yOptimized {
+  /* Optimized for screen readers */
+}
+
+/* SEO Optimization */
+.seoOptimized {
+  /* Semantic HTML support */
+  display: contents;
+}
+
+/* PWA Optimization */
+.pwaOptimized {
+  /* Progressive Web App support */
+}
+
+/* Dark Mode Performance */
+@media (prefers-color-scheme: dark) {
+  .themeOptimized {
+    /* Optimized theme switching */
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+/* Reduced Data Usage */
+@media (prefers-reduced-data: reduce) {
+  .dataOptimized {
+    background: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Performance Utilities */
+.willChangeTransform { will-change: transform; }
+.willChangeOpacity { will-change: opacity; }
+.willChangeScroll { will-change: scroll-position; }
+.willChangeContents { will-change: contents; }
+
+.containLayout { contain: layout; }
+.containStyle { contain: style; }
+.containPaint { contain: paint; }
+.containSize { contain: size; }
+.containStrict { contain: strict; }
+
+.isolationAuto { isolation: auto; }
+.isolationIsolate { isolation: isolate; }
+
+.backfaceVisible { backface-visibility: visible; }
+.backfaceHidden { backface-visibility: hidden; }
+
+.transform3d { transform: translateZ(0); }
+.transformGpu { transform: translate3d(0, 0, 0); }
+
+/* Critical Resource Hints */
+.link[rel="preload"] {
+  /* Preload critical resources */
+}
+
+.link[rel="preconnect"] {
+  /* Preconnect to external domains */
+}
+
+/* Service Worker Support */
+.swSupport {
+  /* Styles for service worker environments */
+}
+
+/* Offline Support */
+.offlineSupport {
+  /* Styles for offline environments */
+}
+
+/* Performance Budget Indicators */
+.performanceBudget {
+  /* Monitor performance budgets */
+  contain: layout style paint;
+}
+
+.performanceBudget::after {
+  content: "Budget: " attr(data-budget);
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 10px;
+  background: var(--success-color);
+  color: white;
+  padding: 2px 4px;
+  border-radius: 2px;
+  opacity: 0.7;
+}
+
+/* Development Helpers */
+.devOnly {
+  /* Only show in development */
+  display: none;
+}
+
+.devOnly.show {
+  display: block;
+}
+
+/* Production Optimizations */
+.prodOnly {
+  /* Only show in production */
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .mobileOptimized {
+    /* Mobile-specific optimizations */
+    touch-action: manipulation;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Desktop Optimizations */
+@media (min-width: 769px) {
+  .desktopOptimized {
+    /* Desktop-specific optimizations */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './UserManagement.css';
+import styles from './UserManagement.module.css';
 
 interface User {
   id: number;
@@ -25,18 +25,18 @@ const UserManagement: React.FC = () => {
 
   return (
     <div className="container">
-      <h1 className="title">User Management</h1>
+      <h1 className="card-title">User Management</h1>
       <div className="card">
-        <ul className="user-list">
+        <ul className={styles.userList}>
           {users.map(user => (
-            <li key={user.id} className="user-item">
+            <li key={user.id} className={styles.userItem}>
               <div>
                 <p><strong>Name:</strong> {user.name}</p>
                 <p><strong>Email:</strong> {user.email}</p>
               </div>
               <div>
-                <button onClick={() => handleEditUser(user.id)}>Edit</button>
-                <button onClick={() => handleDeleteUser(user.id)}>Delete</button>
+                <button onClick={() => handleEditUser(user.id)} className="btn btn-outline btn-sm">Edit</button>
+                <button onClick={() => handleDeleteUser(user.id)} className="btn btn-error btn-sm">Delete</button>
               </div>
             </li>
           ))}

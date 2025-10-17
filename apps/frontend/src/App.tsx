@@ -1,8 +1,8 @@
 import React, { Suspense, lazy, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 
-// Import global styles
-import './styles.css';
+// Import global design system
+import './styles/design-system/index.css';
 
 // Lazy load components for code splitting
 const Live = lazy(() => import('./Live'));

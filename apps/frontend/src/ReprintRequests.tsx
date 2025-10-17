@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './ReprintRequests.css';
+import styles from './ReprintRequests.module.css';
 
 interface ReprintRequest {
   id: number;
@@ -23,26 +23,26 @@ const ReprintRequests: React.FC = () => {
 
   return (
     <div className="container">
-      <h1 className="title">Reprint Requests</h1>
+      <h1 className="card-title">Reprint Requests</h1>
       <div className="card">
         <h2 className="card-title">Pending Requests</h2>
-        <ul className="request-list">
+        <ul className={styles.requestList}>
           {reprintRequests.filter(request => request.status === 'pending').map(request => (
-            <li key={request.id} className="request-item">
+            <li key={request.id} className={styles.requestItem}>
               <div>
                 <p><strong>Email:</strong> {request.email}</p>
                 <p><strong>Reason:</strong> {request.reason}</p>
               </div>
-              <button onClick={() => handleCompleteRequest(request.id)}>Complete</button>
+              <button onClick={() => handleCompleteRequest(request.id)} className="btn btn-success btn-sm">Complete</button>
             </li>
           ))}
         </ul>
       </div>
       <div className="card">
         <h2 className="card-title">Completed Requests</h2>
-        <ul className="request-list">
+        <ul className={styles.requestList}>
           {reprintRequests.filter(request => request.status === 'completed').map(request => (
-            <li key={request.id} className="request-item completed">
+            <li key={request.id} className={`${styles.requestItem} ${styles.completed}`}>
               <div>
                 <p><strong>Email:</strong> {request.email}</p>
                 <p><strong>Reason:</strong> {request.reason}</p>

@@ -1,0 +1,373 @@
+/* Advanced Component System with CSS Modules */
+
+/* Base Components - Extended from design system */
+.baseCard {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--radius-2xl);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  padding: var(--space-8);
+  margin-bottom: var(--space-6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all var(--transition-spring);
+  position: relative;
+  overflow: hidden;
+}
+
+.baseButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3) var(--space-6);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  border-radius: var(--radius-xl);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-spring);
+  text-decoration: none;
+  gap: var(--space-2);
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font-family-sans);
+  letter-spacing: var(--letter-spacing-tight);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.baseFormGroup {
+  margin-bottom: var(--space-6);
+  position: relative;
+}
+
+.baseFormInput {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-spring);
+  font-family: var(--font-family-sans);
+  position: relative;
+  overflow: hidden;
+}
+
+.baseFormLabel {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+  transition: color var(--transition-base);
+}
+
+/* Enhanced Card Variants */
+.dashboardCard {
+  composes: baseCard;
+  transition: all var(--transition-spring);
+  cursor: pointer;
+}
+
+.dashboardCard:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: var(--shadow-xl);
+}
+
+.metricCard {
+  composes: dashboardCard;
+  text-align: center;
+}
+
+.metricCard .metricIcon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xl);
+  margin: 0 auto var(--space-2);
+}
+
+.metricCard .metricValue {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+}
+
+.metricCard .metricLabel {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+/* Enhanced Button Variants */
+.actionButton {
+  composes: baseButton;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.iconButton {
+  composes: actionButton;
+  padding: var(--space-2);
+  min-width: auto;
+  width: auto;
+  height: auto;
+}
+
+.iconButton svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Form Enhancements */
+.enhancedForm {
+  composes: baseCard;
+  max-width: 600px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.formActions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--gray-200);
+}
+
+/* Status Indicators */
+.statusIndicator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.statusSuccess {
+  composes: statusIndicator;
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--success-dark);
+}
+
+.statusWarning {
+  composes: statusIndicator;
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--accent-dark);
+}
+
+.statusError {
+  composes: statusIndicator;
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--error-dark);
+}
+
+.statusInfo {
+  composes: statusIndicator;
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--info-dark);
+}
+
+/* Loading States */
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  color: var(--text-secondary);
+  gap: var(--space-3);
+}
+
+.loadingSpinner {
+  composes: spinner from './components.css';
+}
+
+.loadingText {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+/* Data Display Components */
+.dataGrid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.dataCard {
+  composes: baseCard;
+  padding: var(--space-4);
+}
+
+.dataLabel {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--space-1);
+}
+
+.dataValue {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+/* Navigation Enhancements */
+.navItem {
+  composes: sidebar-link from './components.css';
+  position: relative;
+  overflow: hidden;
+}
+
+.navItem::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--primary-color);
+  transform: scaleY(0);
+  transition: transform var(--transition-base);
+  transform-origin: bottom;
+}
+
+.navItem:hover::before,
+.navItem.active::before {
+  transform: scaleY(1);
+}
+
+.navIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Responsive Utilities */
+.mobileOnly {
+  display: block;
+}
+
+.desktopOnly {
+  display: none;
+}
+
+.showOnMobile {
+  display: block;
+}
+
+.hideOnMobile {
+  display: none;
+}
+
+/* Animation Utilities */
+.fadeIn {
+  animation: var(--animation-fade-in);
+}
+
+.slideUp {
+  animation: var(--animation-slide-up);
+}
+
+.slideDown {
+  animation: var(--animation-slide-down);
+}
+
+.bounceIn {
+  animation: var(--animation-bounce-in);
+}
+
+/* Focus and Accessibility */
+.focusRing:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgb(124 58 237 / 0.1);
+}
+
+.skipLink {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--primary-color);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  z-index: 1000;
+  transition: top var(--transition-base);
+}
+
+.skipLink:focus {
+  top: 6px;
+}
+
+/* Print Styles */
+@media print {
+  .noPrint {
+    display: none !important;
+  }
+
+  .printBreakBefore {
+    break-before: page;
+  }
+
+  .printBreakAfter {
+    break-after: page;
+  }
+}
+
+/* Responsive Design Utilities */
+@media (max-width: 640px) {
+  .mobileOnly {
+    display: block;
+  }
+
+  .desktopOnly {
+    display: none;
+  }
+
+  .showOnMobile {
+    display: block;
+  }
+
+  .hideOnMobile {
+    display: none;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 641px) {
+  .mobileOnly {
+    display: none;
+  }
+
+  .desktopOnly {
+    display: block;
+  }
+
+  .showOnMobile {
+    display: none;
+  }
+
+  .hideOnMobile {
+    display: block;
+  }
+}

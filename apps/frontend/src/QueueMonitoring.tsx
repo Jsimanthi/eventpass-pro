@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './QueueMonitoring.css';
+import styles from './QueueMonitoring.module.css';
 
 interface Job {
   id: number;
@@ -35,11 +35,11 @@ const QueueMonitoring: React.FC = () => {
 
   return (
     <div className="container">
-      <h1 className="title">Job Queue</h1>
+      <h1 className="card-title">Job Queue</h1>
       <div className="card">
-        <ul className="job-list">
+        <ul className={styles.jobList}>
           {jobs.map(job => (
-            <li key={job.id} className={`job-item status-${job.status}`}>
+            <li key={job.id} className={`${styles.jobItem} ${styles[`status${job.status.charAt(0).toUpperCase() + job.status.slice(1)}`]}`}>
               <div>
                 <p><strong>Job ID:</strong> {job.id}</p>
                 <p><strong>Type:</strong> {job.type}</p>

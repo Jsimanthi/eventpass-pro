@@ -1,0 +1,218 @@
+/* Ultra Enhanced Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark Mode Background Colors */
+    --bg-primary: #0f172a;
+    --bg-secondary: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+    --bg-tertiary: #1e293b;
+    --bg-quaternary: #334155;
+    --bg-dark: #020617;
+    --bg-darker: #000000;
+    --bg-glass: rgba(15, 23, 42, 0.8);
+    --bg-glass-strong: rgba(15, 23, 42, 0.95);
+    --bg-glass-dark: rgba(2, 6, 23, 0.9);
+    --bg-overlay: rgba(0, 0, 0, 0.7);
+    --bg-overlay-light: rgba(0, 0, 0, 0.4);
+
+    /* Dark Mode Text Colors */
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+    --text-muted: #64748b;
+    --text-disabled: #475569;
+    --text-on-dark: #f8fafc;
+    --text-on-dark-secondary: #e2e8f0;
+    --text-on-dark-muted: #cbd5e1;
+
+    /* Dark Mode Gradients */
+    --primary-gradient-subtle: linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
+    --bg-glass-blur: rgba(15, 23, 42, 0.2);
+  }
+
+  /* Dark Mode Body Background */
+  body::before {
+    background:
+      radial-gradient(circle at 20% 80%, rgba(124, 58, 237, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 60% 10%, rgba(245, 158, 11, 0.06) 0%, transparent 50%);
+  }
+
+  body::after {
+    background:
+      radial-gradient(circle at 30% 70%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 70% 30%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+  }
+
+  /* Dark Mode Card Enhancements */
+  .card {
+    border-color: rgba(148, 163, 184, 0.1);
+    background: var(--bg-glass);
+  }
+
+  .card:hover {
+    border-color: rgba(124, 58, 237, 0.3);
+  }
+
+  /* Dark Mode Form Enhancements */
+  .form-input {
+    background-color: var(--bg-tertiary);
+    border-color: var(--gray-600);
+    color: var(--text-primary);
+  }
+
+  .form-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgb(124 58 237 / 0.2);
+    background-color: var(--bg-tertiary);
+  }
+
+  .form-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  /* Dark Mode Button Enhancements */
+  .btn-secondary {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border-color: var(--gray-600);
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    background-color: var(--bg-quaternary);
+    border-color: var(--gray-500);
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    background-color: var(--bg-tertiary);
+  }
+
+  /* Dark Mode Navigation */
+  .nav {
+    background-color: var(--bg-primary);
+    border-bottom-color: var(--gray-700);
+  }
+
+  .sidebar {
+    background-color: var(--bg-primary);
+    border-right-color: var(--gray-700);
+  }
+
+  .sidebar-link:hover {
+    background-color: var(--bg-tertiary);
+  }
+
+  .sidebar-link.active {
+    background-color: var(--primary-color);
+  }
+
+  /* Dark Mode Badge and Status */
+  .badge-primary {
+    background-color: var(--primary-lighter);
+    color: var(--primary-dark);
+  }
+
+  .badge-success {
+    background-color: var(--secondary-lighter);
+    color: var(--secondary-dark);
+  }
+
+  .badge-warning {
+    background-color: var(--accent-lighter);
+    color: var(--accent-dark);
+  }
+
+  .badge-error {
+    background-color: var(--error-lighter);
+    color: var(--error-dark);
+  }
+
+  /* Dark Mode Loading States */
+  .skeleton {
+    background: linear-gradient(90deg, var(--gray-700) 25%, var(--gray-600) 50%, var(--gray-700) 75%);
+    background-size: 200% 100%;
+  }
+}
+
+/* Manual Dark Mode Toggle Support */
+[data-theme="dark"] {
+  /* Dark Mode Background Colors */
+  --bg-primary: #0f172a;
+  --bg-secondary: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+  --bg-tertiary: #1e293b;
+  --bg-quaternary: #334155;
+  --bg-dark: #020617;
+  --bg-darker: #000000;
+  --bg-glass: rgba(15, 23, 42, 0.8);
+  --bg-glass-strong: rgba(15, 23, 42, 0.95);
+  --bg-glass-dark: rgba(2, 6, 23, 0.9);
+  --bg-overlay: rgba(0, 0, 0, 0.7);
+  --bg-overlay-light: rgba(0, 0, 0, 0.4);
+
+  /* Dark Mode Text Colors */
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-tertiary: #94a3b8;
+  --text-muted: #64748b;
+  --text-disabled: #475569;
+  --text-on-dark: #f8fafc;
+  --text-on-dark-secondary: #e2e8f0;
+  --text-on-dark-muted: #cbd5e1;
+
+  /* Dark Mode Gradients */
+  --primary-gradient-subtle: linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
+  --bg-glass-blur: rgba(15, 23, 42, 0.2);
+}
+
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus States */
+.btn:focus-visible,
+.form-input:focus-visible,
+.sidebar-link:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .card {
+    border: 2px solid var(--gray-400);
+  }
+
+  .btn {
+    border: 2px solid;
+  }
+
+  .form-input {
+    border: 2px solid var(--gray-600);
+  }
+}
+
+/* Print Styles */
+@media print {
+  .btn,
+  .sidebar,
+  .logout-btn,
+  .modal-overlay {
+    display: none !important;
+  }
+
+  .card {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+
+  body {
+    background: white !important;
+  }
+}

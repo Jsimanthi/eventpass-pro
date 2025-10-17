@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './PrivacyControls.css';
+import styles from './PrivacyControls.module.css';
 
 const PrivacyControls: React.FC = () => {
   const [anonymizationLevel, setAnonymizationLevel] = useState('full');
@@ -21,10 +21,10 @@ const PrivacyControls: React.FC = () => {
 
   return (
     <div className="container">
-      <h1 className="title">Privacy Controls</h1>
+      <h1 className="card-title">Privacy Controls</h1>
       <div className="card">
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label>Anonymization Level:</label>
             <div>
               <label>
@@ -49,7 +49,7 @@ const PrivacyControls: React.FC = () => {
               </label>
             </div>
           </div>
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label>
               <input
                 type="checkbox"
@@ -59,7 +59,7 @@ const PrivacyControls: React.FC = () => {
               Receive notifications about data usage
             </label>
           </div>
-          <button type="submit" className="submit-button">Save Settings</button>
+          <button type="submit" className={styles.submitButton}>Save Settings</button>
         </form>
       </div>
     </div>
