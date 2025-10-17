@@ -18,15 +18,30 @@ const Scan = lazy(() => import('./Scan'));
 // Eager load critical components
 import PrivateRoute from './PrivateRoute';
 
-// Navigation Icons (using simple text for now, can be replaced with icon library later)
-const DashboardIcon = () => <span>📊</span>;
-const LiveIcon = () => <span>🔴</span>;
-const UsersIcon = () => <span>👥</span>;
-const SettingsIcon = () => <span>⚙️</span>;
-const ScanIcon = () => <span>📱</span>;
-const QueueIcon = () => <span>⏱️</span>;
-const PrivacyIcon = () => <span>🔒</span>;
-const ReprintIcon = () => <span>🖨️</span>;
+// Navigation Icons (using Lucide React icons)
+import {
+  BarChart3,
+  Radio,
+  Users,
+  Settings,
+  Smartphone,
+  Clock,
+  Shield,
+  Printer,
+  Menu,
+  X
+} from 'lucide-react';
+
+const DashboardIcon = () => <BarChart3 size={20} />;
+const LiveIcon = () => <Radio size={20} />;
+const UsersIcon = () => <Users size={20} />;
+const SettingsIcon = () => <Settings size={20} />;
+const ScanIcon = () => <Smartphone size={20} />;
+const QueueIcon = () => <Clock size={20} />;
+const PrivacyIcon = () => <Shield size={20} />;
+const ReprintIcon = () => <Printer size={20} />;
+const MenuIcon = () => <Menu size={20} />;
+const CloseIcon = () => <X size={20} />;
 
 const Navigation: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   const location = useLocation();
@@ -49,8 +64,9 @@ const Navigation: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         className="btn btn-ghost sidebar-toggle"
         onClick={() => setSidebarOpen(!sidebarOpen)}
         style={{ display: 'none' }}
+        aria-label="Toggle sidebar menu"
       >
-        ☰
+        <MenuIcon />
       </button>
 
       {/* Sidebar */}

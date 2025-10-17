@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { Eye, EyeOff, Ticket, Mail, Lock } from 'lucide-react';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ const Login: React.FC = () => {
   });
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -62,7 +64,9 @@ const Login: React.FC = () => {
       <div className="login-container">
         <div className="login-header">
           <div className="login-logo">
-            <span className="logo-icon">🎫</span>
+            <div className="logo-icon">
+              <Ticket size={48} />
+            </div>
             <h1 className="logo-text">EventPass</h1>
           </div>
           <p className="login-subtitle">Welcome back! Please sign in to your account.</p>
@@ -71,6 +75,7 @@ const Login: React.FC = () => {
         <form onSubmit={handleLogin} className="login-form">
           <div className="form-group">
             <label htmlFor="email" className="form-label">
+              <Mail size={16} style={{ marginRight: 'var(--space-2)' }} />
               Email Address
             </label>
             <input
@@ -82,23 +87,46 @@ const Login: React.FC = () => {
               value={formData.email}
               onChange={handleInputChange}
               required
+              autoComplete="email"
             />
           </div>
 
           <div className="form-group">
             <label htmlFor="password" className="form-label">
+              <Lock size={16} style={{ marginRight: 'var(--space-2)' }} />
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className="form-input"
-              placeholder="Enter your password"
-              value={formData.password}
-              onChange={handleInputChange}
-              required
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                name="password"
+                className="form-input"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleInputChange}
+                required
+                autoComplete="current-password"
+                style={{ paddingRight: 'var(--space-12)' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="btn btn-ghost"
+                style={{
+                  position: 'absolute',
+                  right: 'var(--space-2)',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  padding: 'var(--space-1)',
+                  minWidth: 'auto',
+                  height: 'auto'
+                }}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
 
           {message && (

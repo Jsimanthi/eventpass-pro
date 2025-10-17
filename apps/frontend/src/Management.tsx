@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import EventList from './EventList';
+import {
+  BarChart3,
+  Users,
+  CheckCircle,
+  TrendingUp,
+  Download,
+  RefreshCw,
+  Calendar,
+  UserCheck
+} from 'lucide-react';
 
 declare global {
   interface ImportMeta {
@@ -157,7 +167,7 @@ const Management: React.FC = () => {
         gap: 'var(--space-6)',
         marginBottom: 'var(--space-8)'
       }}>
-        <div className="card">
+        <div className="card card-interactive">
           <div className="card-content">
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
               <div style={{
@@ -168,9 +178,10 @@ const Management: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 'var(--font-size-xl)'
+                fontSize: 'var(--font-size-xl)',
+                color: 'var(--primary-dark)'
               }}>
-                📊
+                <Calendar size={24} />
               </div>
               <div>
                 <p style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', margin: 0 }}>
@@ -184,7 +195,7 @@ const Management: React.FC = () => {
           </div>
         </div>
 
-        <div className="card">
+        <div className="card card-interactive">
           <div className="card-content">
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
               <div style={{
@@ -195,9 +206,10 @@ const Management: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 'var(--font-size-xl)'
+                fontSize: 'var(--font-size-xl)',
+                color: 'var(--secondary-dark)'
               }}>
-                👥
+                <Users size={24} />
               </div>
               <div>
                 <p style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', margin: 0 }}>
@@ -211,7 +223,7 @@ const Management: React.FC = () => {
           </div>
         </div>
 
-        <div className="card">
+        <div className="card card-interactive">
           <div className="card-content">
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
               <div style={{
@@ -225,7 +237,7 @@ const Management: React.FC = () => {
                 justifyContent: 'center',
                 fontSize: 'var(--font-size-xl)'
               }}>
-                ✅
+                <UserCheck size={24} />
               </div>
               <div>
                 <p style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', margin: 0 }}>
@@ -239,7 +251,7 @@ const Management: React.FC = () => {
           </div>
         </div>
 
-        <div className="card">
+        <div className="card card-interactive">
           <div className="card-content">
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
               <div style={{
@@ -250,9 +262,10 @@ const Management: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 'var(--font-size-xl)'
+                fontSize: 'var(--font-size-xl)',
+                color: 'var(--accent-dark)'
               }}>
-                📈
+                <TrendingUp size={24} />
               </div>
               <div>
                 <p style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', margin: 0 }}>
@@ -281,12 +294,13 @@ const Management: React.FC = () => {
             >
               {exporting ? (
                 <>
-                  <div className="spinner"></div>
+                  <div className="spinner spinner-sm"></div>
                   Exporting...
                 </>
               ) : (
                 <>
-                  📥 Export CSV ({checkIns.length} records)
+                  <Download size={16} style={{ marginRight: 'var(--space-2)' }} />
+                  Export CSV ({checkIns.length} records)
                 </>
               )}
             </button>
@@ -294,7 +308,8 @@ const Management: React.FC = () => {
               onClick={fetchCheckIns}
               className="btn btn-outline"
             >
-              🔄 Refresh Data
+              <RefreshCw size={16} style={{ marginRight: 'var(--space-2)' }} />
+              Refresh Data
             </button>
           </div>
         </div>
