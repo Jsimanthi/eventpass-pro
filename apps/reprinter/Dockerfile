@@ -10,11 +10,14 @@ COPY go.mod go.sum ./
 # Download the Go modules
 RUN go mod download
 
+# Copy the backend db package (needed by reprinter)
+COPY apps/backend/db/ ./apps/backend/db/
+
 # Copy the source code
-COPY . .
+COPY apps/reprinter/ ./
 
 # Build the Go application
-RUN go build -o /app/reprinter ./apps/reprinter
+RUN go build -o reprinter
 
 # Copy the wait script
 COPY infra/scripts/wait-for-services.sh /usr/local/bin/

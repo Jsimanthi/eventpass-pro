@@ -9,15 +9,12 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'https://localhost:8080',
+        target: 'http://localhost:8080',
         changeOrigin: true,
-        secure: true,
-        agent: new (require('https').Agent)({
-          rejectUnauthorized: false
-        })
+        secure: false
       },
       '/ws': {
-        target: 'wss://localhost:8080',
+        target: 'ws://localhost:8080',
         ws: true
       }
     }

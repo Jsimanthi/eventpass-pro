@@ -27,13 +27,17 @@ func main() {
 
 	amqpConn, err := amqp.Dial(os.Getenv("RABBITMQ_URL"))
 	if err != nil {
-		log.Fatalf("Failed to connect to RabbitMQ: %s", err)
+		log.Printf("Failed to connect to RabbitMQ: %s", err)
+		log.Printf("Reprinter service will not process reprint requests until RabbitMQ is available")
+		return
 	}
 	defer amqpConn.Close()
 
 	amqpChannel, err := amqpConn.Channel()
 	if err != nil {
-		log.Fatalf("Failed to open a channel: %s", err)
+		log.Printf("Failed to open a channel: %s", err)
+		log.Printf("Reprinter service will not process reprint requests until RabbitMQ channel is available")
+		return
 	}
 	defer amqpChannel.Close()
 
@@ -46,7 +50,9 @@ func main() {
 		nil,        // arguments
 	)
 	if err != nil {
-		log.Fatalf("Failed to declare a queue: %s", err)
+		log.Printf("Failed to declare a queue: %s", err)
+		log.Printf("Reprinter service will not process reprint requests until queue is available")
+		return
 	}
 
 	msgs, err := amqpChannel.Consume(
@@ -59,7 +65,9 @@ func main() {
 		nil,    // args
 	)
 	if err != nil {
-		log.Fatalf("Failed to register a consumer: %s", err)
+		log.Printf("Failed to register a consumer: %s", err)
+		log.Printf("Reprinter service will not process reprint requests until consumer is available")
+		return
 	}
 
 	forever := make(chan bool)

@@ -59,7 +59,7 @@ func main() {
 	queries := db.New(pool)
 
 	// Initialize TimescaleDB continuous aggregates for analytics
-	createContinuousAggregates(pool)
+	createContinuousAggregates()
 	LogInfo(context.Background(), "TimescaleDB continuous aggregates initialized")
 
 	// MinIO client initialization
@@ -88,8 +88,7 @@ func main() {
 		if errBucketExists == nil && exists {
 			LogInfo(context.Background(), "MinIO bucket already exists", slog.String("bucket", bucketName))
 		} else {
-			LogError(context.Background(), "Failed to create MinIO bucket", err)
-			log.Fatalln(err)
+			LogWarn(context.Background(), "MinIO bucket creation failed, but continuing", slog.String("error", err.Error()))
 		}
 	} else {
 		LogInfo(context.Background(), "MinIO bucket created successfully", slog.String("bucket", bucketName))
@@ -107,23 +106,23 @@ func main() {
 	rdb := redis.NewClient(opt)
 	LogInfo(context.Background(), "Redis client created successfully")
 
+	var amqpChannel *amqp.Channel
 	amqpConn, err := amqp.Dial(os.Getenv("RABBITMQ_URL"))
 	if err != nil {
-		LogError(context.Background(), "Failed to connect to RabbitMQ", err)
-		log.Fatalf("Failed to connect to RabbitMQ: %s", err)
+		LogWarn(context.Background(), "Failed to connect to RabbitMQ, continuing without it", slog.String("error", err.Error()))
+		amqpChannel = nil
+	} else {
+		LogInfo(context.Background(), "RabbitMQ connection established successfully")
+
+		amqpChannel, err = amqpConn.Channel()
+		if err != nil {
+			LogWarn(context.Background(), "Failed to open RabbitMQ channel, continuing without it", slog.String("error", err.Error()))
+			amqpChannel = nil
+		} else {
+			LogInfo(context.Background(), "RabbitMQ channel opened successfully")
+		}
+		defer amqpConn.Close()
 	}
-	defer amqpConn.Close()
-
-	LogInfo(context.Background(), "RabbitMQ connection established successfully")
-
-	amqpChannel, err := amqpConn.Channel()
-	if err != nil {
-		LogError(context.Background(), "Failed to open RabbitMQ channel", err)
-		log.Fatalf("Failed to open a channel: %s", err)
-	}
-	defer amqpChannel.Close()
-
-	LogInfo(context.Background(), "RabbitMQ channel opened successfully")
 
 	r := mux.NewRouter()
 
@@ -184,7 +183,12 @@ func main() {
 		port = "8080"
 	}
 
-	ensureTLS(port, r)
+	// Serve HTTP instead of HTTPS for development
+	LogInfo(context.Background(), "Starting EventPass Pro server",
+		slog.String("address", "http://localhost:"+port))
+
+	log.Printf("Starting server on http://localhost:%s", port)
+	log.Fatal(http.ListenAndServe(":"+port, r))
 }
 
 func ensureTLS(port string, router http.Handler) {
@@ -247,6 +251,11 @@ func (rw *responseWriter) WriteHeader(code int) {
 }
 
 func (api *API) TestPublish(w http.ResponseWriter, r *http.Request) {
+	if api.amqpChannel == nil {
+		http.Error(w, "RabbitMQ not available", http.StatusServiceUnavailable)
+		return
+	}
+
 	err := api.amqpChannel.Publish(
 		"",      // exchange
 		"hello", // routing key

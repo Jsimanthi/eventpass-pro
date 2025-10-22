@@ -10,11 +10,14 @@ COPY go.mod go.sum ./
 # Download the Go modules
 RUN go mod download
 
+# Copy the backend db package (needed by worker)
+COPY apps/backend/db/ ./apps/backend/db/
+
 # Copy the source code
-COPY . .
+COPY apps/workers/ ./
 
 # Build the Go application
-RUN go build -o /app/worker ./apps/workers
+RUN go build -o worker
 
 # Copy the wait script
 COPY infra/scripts/wait-for-services.sh /usr/local/bin/
