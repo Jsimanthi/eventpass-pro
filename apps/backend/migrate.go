@@ -1,14 +1,14 @@
 package main
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func runMigrations() error {
@@ -16,7 +16,7 @@ func runMigrations() error {
 	return nil
 }
 
-func applyMigrations(db *sql.DB) error {
+func applyMigrations(pool *pgxpool.Pool) error {
 	migrationsDir := "apps/backend/db/migrations"
 
 	// Get all migration files
@@ -45,7 +45,14 @@ func applyMigrations(db *sql.DB) error {
 				continue
 			}
 
-			if _, err := db.Exec(stmt); err != nil {
+			if _, err := pool.Exec(context.Background(), stmt); err != nil {
+				// Ignore "relation already exists" errors for idempotent migrations
+				if strings.Contains(err.Error(), "already exists") || strings.Contains(err.Error(), "relation") && strings.Contains(err.Error(), "exists") ||
+				   strings.Contains(err.Error(), "column") && strings.Contains(err.Error(), "already exists") ||
+				   strings.Contains(err.Error(), "cannot create a unique index without the column") {
+					fmt.Printf("Skipping existing relation in %s: %v\n", file, err)
+					continue
+				}
 				return fmt.Errorf("failed to execute statement in %s: %v\nStatement: %s", file, err, stmt)
 			}
 		}

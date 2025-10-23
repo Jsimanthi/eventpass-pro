@@ -56,6 +56,14 @@ func main() {
 	defer pool.Close()
 
 	LogInfo(context.Background(), "Database connection established successfully")
+
+	// Apply database migrations
+	if err := applyMigrations(pool); err != nil {
+		LogError(context.Background(), "Failed to apply migrations", err)
+		log.Fatalf("Migration failed: %v", err)
+	}
+	LogInfo(context.Background(), "Database migrations applied successfully")
+
 	queries := db.New(pool)
 
 	// Initialize TimescaleDB continuous aggregates for analytics

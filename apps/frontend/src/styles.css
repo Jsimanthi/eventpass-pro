@@ -1009,11 +1009,18 @@ p {
   width: var(--sidebar-width);
   background-color: var(--bg-primary);
   border-right: 1px solid var(--gray-200);
-  height: calc(100vh - var(--header-height));
+  height: 100vh;
   overflow-y: auto;
   position: fixed;
   left: 0;
-  top: var(--header-height);
+  top: 0;
+  z-index: 10;
+  display: none;
+}
+
+/* Show sidebar only for authenticated users */
+.app:has(.main-content:not(.main-content-full)) .sidebar {
+  display: block;
 }
 
 .sidebar-nav {
@@ -1354,6 +1361,10 @@ p {
   transition: margin-left var(--transition-base);
 }
 
+.main-content-full {
+  margin-left: 0;
+}
+
 .sidebar-toggle {
   position: fixed;
   top: var(--space-4);
@@ -1462,6 +1473,7 @@ p {
   justify-content: center;
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
   padding: var(--space-4);
+  margin-left: 0 !important;
 }
 
 .login-container {

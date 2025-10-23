@@ -32,8 +32,7 @@ const InviteeUpload: React.FC<InviteeUploadProps> = ({ eventId }) => {
     formData.append('file', file);
 
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-      const response = await fetch(`${baseUrl}/api/events/${eventId}/invitees`,
+      const response = await fetch(`/api/events/${eventId}/invitees`,
         {
           method: 'POST',
           headers: {

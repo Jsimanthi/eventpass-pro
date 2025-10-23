@@ -38,8 +38,7 @@ const Management: React.FC = () => {
   const fetchCheckIns = async () => {
     try {
       setLoading(true);
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-      const response = await fetch(`${baseUrl}/api/events`, {
+      const response = await fetch('/api/events', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'
@@ -55,10 +54,9 @@ const Management: React.FC = () => {
 
       // Get check-ins for all events
       const allCheckIns: CheckIn[] = [];
-      for (const event of events) {
+      for (const event of eventsData) {
         try {
-          const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-          const inviteesResponse = await fetch(`${baseUrl}/api/events/${event.id}/invitees`, {
+          const inviteesResponse = await fetch(`/api/events/${event.id}/invitees`, {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`,
               'Content-Type': 'application/json'

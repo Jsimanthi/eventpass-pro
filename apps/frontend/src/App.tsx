@@ -46,6 +46,10 @@ const CloseIcon = () => <X size={20} />;
 const Navigation: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const token = localStorage.getItem('token');
+
+  // Check if current path is a public route (login/register)
+  const isPublicRoute = location.pathname === '/' || location.pathname === '/login' || location.pathname === '/register';
 
   const navigationItems = [
     { path: '/live', label: 'Live Dashboard', icon: LiveIcon },
@@ -59,45 +63,47 @@ const Navigation: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
 
   return (
     <>
-      {/* Mobile menu button */}
+      {/* Mobile menu button - only show for authenticated users */}
       <button
         className="btn btn-ghost sidebar-toggle"
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        style={{ display: 'none' }}
+        style={{ display: token && !isPublicRoute ? 'flex' : 'none' }}
         aria-label="Toggle sidebar menu"
       >
         <MenuIcon />
       </button>
 
-      {/* Sidebar */}
-      <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
-        <div className="sidebar-header">
-          <h2 className="sidebar-brand">EventPass</h2>
-          <p className="sidebar-subtitle">Event Management System</p>
-        </div>
-        
-        <nav className="sidebar-nav">
-          <ul className="sidebar-menu">
-            {navigationItems.map((item) => (
-              <li key={item.path} className="sidebar-menu-item">
-                <Link
-                  to={item.path}
-                  className={`sidebar-link ${
-                    location.pathname === item.path ? 'active' : ''
-                  }`}
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <item.icon />
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </aside>
+      {/* Sidebar - only show for authenticated users */}
+      {token && !isPublicRoute && (
+        <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
+          <div className="sidebar-header">
+            <h2 className="sidebar-brand">EventPass</h2>
+            <p className="sidebar-subtitle">Event Management System</p>
+          </div>
+
+          <nav className="sidebar-nav">
+            <ul className="sidebar-menu">
+              {navigationItems.map((item) => (
+                <li key={item.path} className="sidebar-menu-item">
+                  <Link
+                    to={item.path}
+                    className={`sidebar-link ${
+                      location.pathname === item.path ? 'active' : ''
+                    }`}
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    <item.icon />
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </aside>
+      )}
 
       {/* Main content area */}
-      <div className="main-content">
+      <div className={`main-content ${(!token || isPublicRoute) ? 'main-content-full' : ''}`}>
         <Suspense fallback={
           <div className="loading">
             <div className="spinner"></div>
@@ -140,14 +146,16 @@ const Navigation: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         </Suspense>
       </div>
 
-      {/* Logout button - positioned absolutely */}
-      <button
-        onClick={onLogout}
-        className="btn btn-error logout-btn"
-        title="Logout"
-      >
-        Logout
-      </button>
+      {/* Logout button - only show for authenticated users */}
+      {token && !isPublicRoute && (
+        <button
+          onClick={onLogout}
+          className="btn btn-error logout-btn"
+          title="Logout"
+        >
+          Logout
+        </button>
+      )}
     </>
   );
 };
