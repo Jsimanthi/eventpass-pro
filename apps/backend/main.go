@@ -152,6 +152,13 @@ func main() {
 	r.Use(requestLoggingMiddleware)
 	r.Use(metricsMiddleware)
 
+	// Default route handler
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status":"EventPass Pro Backend API","version":"1.0.0","message":"Backend is running successfully"}`))
+	}).Methods("GET")
+
 	// Public routes
 	r.HandleFunc("/test-publish", api.TestPublish).Methods("GET")
 	r.HandleFunc("/validate", api.ValidateInvitee).Methods("GET")
