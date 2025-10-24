@@ -806,6 +806,7 @@ func (api *API) Login(w http.ResponseWriter, r *http.Request) {
 	LogInfo(ctx, "User login successful",
 		slog.String("email", loginRequest.Email))
 
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{
 		"token": token,
 	})
@@ -815,7 +816,7 @@ func (api *API) createLogin(userID uuid.UUID) (string, error) {
 	// Create a new token object, specifying signing method and the claims
 	// you would like it to contain.
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": userID,
+		"user_id": userID.String(),
 		"exp":     time.Now().Add(time.Hour * 24).Unix(),
 	})
 
@@ -860,6 +861,7 @@ func (api *API) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	LogUserRegistration(ctx, newUser.Email)
 	RecordUserRegistration()
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(user)
 }
 

@@ -4,11 +4,10 @@ import InviteeList from './InviteeList';
 import InviteeUpload from './InviteeUpload';
 
 interface Event {
-  id: number;
+  id?: number;
   name: string;
-  description: string;
-  start_date: string;
-  end_date: string;
+  date: string;
+  location: string;
 }
 
 const EventList: React.FC = () => {
@@ -54,7 +53,11 @@ const EventList: React.FC = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(event)
+        body: JSON.stringify({
+          Name: event.name,
+          Date: event.date,
+          Location: event.location
+        })
       });
 
       if (!response.ok) {
@@ -122,49 +125,134 @@ const EventList: React.FC = () => {
   }
 
   return (
-    <div>
-      <h2>Event List</h2>
-      <button onClick={handleAddNew}>Add New Event</button>
-      {showForm && (
-        <EventForm
-          event={editingEvent}
-          onSave={handleSave}
-        />
-      )}
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {events.map(event => (
-            <tr key={event.id} onClick={() => handleSelectEvent(event.id)} style={{ cursor: 'pointer' }}>
-              <td>{event.id}</td>
-              <td>{event.name}</td>
-              <td>{event.description}</td>
-              <td>{new Date(event.start_date).toLocaleString()}</td>
-              <td>{new Date(event.end_date).toLocaleString()}</td>
-              <td>
-                <button onClick={(e) => { e.stopPropagation(); handleEdit(event); }}>Edit</button>
-                <button onClick={(e) => { e.stopPropagation(); handleDelete(event.id); }}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {selectedEventId && (
-        <div>
-          <button onClick={handleShowUpload}>Upload Invitees</button>
-          {showUpload && <InviteeUpload eventId={selectedEventId} />}
-          <InviteeList eventId={selectedEventId} />
+    <div className="card">
+      <div className="card-header">
+        <h2 className="card-title">Event List</h2>
+        <p className="card-subtitle">Manage your events and invitees</p>
+      </div>
+      <div className="card-content">
+        <div style={{ display: 'flex', gap: 'var(--space-4)', marginBottom: 'var(--space-6)', flexWrap: 'wrap' }}>
+          <button onClick={handleAddNew} className="btn btn-primary">
+            Add New Event
+          </button>
+          {selectedEventId && (
+            <button onClick={handleShowUpload} className="btn btn-secondary">
+              {showUpload ? 'Hide' : 'Show'} Upload Invitees
+            </button>
+          )}
         </div>
-      )}
+
+        {showForm && (
+          <div style={{ marginBottom: 'var(--space-6)' }}>
+            <EventForm
+              event={editingEvent}
+              onSave={handleSave}
+            />
+          </div>
+        )}
+
+        {events.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: 'var(--space-8)', color: 'var(--text-secondary)' }}>
+            <p>No events found. Create your first event to get started.</p>
+          </div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              background: 'var(--bg-primary)',
+              borderRadius: 'var(--radius-lg)',
+              overflow: 'hidden',
+              boxShadow: 'var(--shadow-sm)'
+            }}>
+              <thead style={{ background: 'var(--gray-50)' }}>
+                <tr>
+                  <th style={{
+                    padding: 'var(--space-4)',
+                    textAlign: 'left',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--text-primary)',
+                    borderBottom: '2px solid var(--gray-200)'
+                  }}>ID</th>
+                  <th style={{
+                    padding: 'var(--space-4)',
+                    textAlign: 'left',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--text-primary)',
+                    borderBottom: '2px solid var(--gray-200)'
+                  }}>Name</th>
+                  <th style={{
+                    padding: 'var(--space-4)',
+                    textAlign: 'left',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--text-primary)',
+                    borderBottom: '2px solid var(--gray-200)'
+                  }}>Location</th>
+                  <th style={{
+                    padding: 'var(--space-4)',
+                    textAlign: 'left',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--text-primary)',
+                    borderBottom: '2px solid var(--gray-200)'
+                  }}>Date</th>
+                  <th style={{
+                    padding: 'var(--space-4)',
+                    textAlign: 'left',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--text-primary)',
+                    borderBottom: '2px solid var(--gray-200)'
+                  }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {events.map(event => (
+                  <tr key={event.id}
+                      onClick={() => event.id && handleSelectEvent(event.id)}
+                      style={{
+                        cursor: 'pointer',
+                        transition: 'background-color var(--transition-base)',
+                        borderBottom: '1px solid var(--gray-200)'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--gray-50)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                    <td style={{ padding: 'var(--space-4)', color: 'var(--text-secondary)' }}>{event.id}</td>
+                    <td style={{ padding: 'var(--space-4)', fontWeight: 'var(--font-weight-medium)', color: 'var(--text-primary)' }}>{event.name}</td>
+                    <td style={{ padding: 'var(--space-4)', color: 'var(--text-secondary)' }}>{event.location}</td>
+                    <td style={{ padding: 'var(--space-4)', color: 'var(--text-secondary)' }}>{new Date(event.date).toLocaleString()}</td>
+                    <td style={{ padding: 'var(--space-4)' }}>
+                      <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleEdit(event); }}
+                          className="btn btn-sm btn-outline"
+                          style={{ fontSize: 'var(--font-size-xs)' }}>
+                          Edit
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); event.id && handleDelete(event.id); }}
+                          className="btn btn-sm btn-error"
+                          style={{ fontSize: 'var(--font-size-xs)' }}>
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {selectedEventId && (
+          <div style={{ marginTop: 'var(--space-6)' }}>
+            {showUpload && (
+              <div style={{ marginBottom: 'var(--space-6)' }}>
+                <InviteeUpload eventId={selectedEventId} />
+              </div>
+            )}
+            <InviteeList eventId={selectedEventId} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

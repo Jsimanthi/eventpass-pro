@@ -3,9 +3,8 @@ import React, { useState, useEffect } from 'react';
 interface Event {
   id?: number;
   name: string;
-  description: string;
-  start_date: string;
-  end_date: string;
+  date: string;
+  location: string;
 }
 
 interface EventFormProps {
@@ -15,7 +14,7 @@ interface EventFormProps {
 
 const EventForm: React.FC<EventFormProps> = ({ event, onSave }) => {
   const [formData, setFormData] = useState<Event>(
-    event || { name: '', description: '', start_date: '', end_date: '' }
+    event || { name: '', date: '', location: '' }
   );
 
   useEffect(() => {
@@ -35,38 +34,55 @@ const EventForm: React.FC<EventFormProps> = ({ event, onSave }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        name="name"
-        placeholder="Event Name"
-        value={formData.name}
-        onChange={handleChange}
-        required
-      />
-      <textarea
-        name="description"
-        placeholder="Event Description"
-        value={formData.description}
-        onChange={handleChange}
-        required
-      />
-      <input
-        type="datetime-local"
-        name="start_date"
-        value={formData.start_date}
-        onChange={handleChange}
-        required
-      />
-      <input
-        type="datetime-local"
-        name="end_date"
-        value={formData.end_date}
-        onChange={handleChange}
-        required
-      />
-      <button type="submit">Save Event</button>
-    </form>
+    <div className="card">
+      <div className="card-header">
+        <h3 className="card-title">{event ? 'Edit Event' : 'Add New Event'}</h3>
+      </div>
+      <div className="card-content">
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+          <div className="form-group">
+            <label className="form-label">Event Name</label>
+            <input
+              type="text"
+              name="name"
+              className="form-input"
+              placeholder="Enter event name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Location</label>
+            <input
+              type="text"
+              name="location"
+              className="form-input"
+              placeholder="Enter event location"
+              value={formData.location}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Date & Time</label>
+            <input
+              type="datetime-local"
+              name="date"
+              className="form-input"
+              value={formData.date}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'flex-end' }}>
+            <button type="submit" className="btn btn-primary">
+              Save Event
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 

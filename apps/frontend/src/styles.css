@@ -1,32 +1,32 @@
 /* World-Class Design System for EventPass */
 :root {
-  /* Primary Brand Colors - Enhanced */
-  --primary-color: #7c3aed;
-  --primary-dark: #6d28d9;
-  --primary-darker: #5b21b6;
-  --primary-light: #a78bfa;
-  --primary-lighter: #c4b5fd;
-  --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
-  --primary-gradient-hover: linear-gradient(135deg, #6d28d9 0%, #db2777 100%);
-  --primary-gradient-subtle: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+  /* Primary Brand Colors - Professional Blue */
+  --primary-color: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-darker: #1e40af;
+  --primary-light: #60a5fa;
+  --primary-lighter: #93c5fd;
+  --primary-gradient: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
+  --primary-gradient-hover: linear-gradient(135deg, #1d4ed8 0%, #0284c7 100%);
+  --primary-gradient-subtle: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(14, 165, 233, 0.1) 100%);
 
-  /* Secondary Colors - Enhanced */
-  --secondary-color: #06b6d4;
-  --secondary-dark: #0891b2;
-  --secondary-darker: #0e7490;
-  --secondary-light: #67e8f9;
-  --secondary-lighter: #a5f3fc;
-  --secondary-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-  --secondary-gradient-hover: linear-gradient(135deg, #0891b2 0%, #2563eb 100%);
+  /* Secondary Colors - Professional Green */
+  --secondary-color: #059669;
+  --secondary-dark: #047857;
+  --secondary-darker: #065f46;
+  --secondary-light: #34d399;
+  --secondary-lighter: #6ee7b7;
+  --secondary-gradient: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  --secondary-gradient-hover: linear-gradient(135deg, #047857 0%, #059669 100%);
 
-  /* Accent Colors - Enhanced */
-  --accent-color: #f59e0b;
-  --accent-dark: #d97706;
-  --accent-darker: #b45309;
-  --accent-light: #fbbf24;
-  --accent-lighter: #fcd34d;
-  --accent-gradient: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
-  --accent-gradient-hover: linear-gradient(135deg, #d97706 0%, #dc2626 100%);
+  /* Accent Colors - Professional Orange */
+  --accent-color: #ea580c;
+  --accent-dark: #dc2626;
+  --accent-darker: #b91c1c;
+  --accent-light: #f97316;
+  --accent-lighter: #fb923c;
+  --accent-gradient: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+  --accent-gradient-hover: linear-gradient(135deg, #dc2626 0%, #ea580c 100%);
 
   /* Status Colors - Enhanced */
   --success-color: #10b981;
@@ -58,14 +58,14 @@
   --gray-900: #18181b;
   --gray-950: #09090b;
 
-  /* Background Colors - Enhanced */
+  /* Background Colors - Professional */
   --bg-primary: #ffffff;
-  --bg-secondary: linear-gradient(145deg, #fafafa 0%, #f4f4f5 100%);
+  --bg-secondary: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
   --bg-tertiary: #f8fafc;
-  --bg-quaternary: #f1f5f9;
+  --bg-quaternary: #e2e8f0;
   --bg-dark: #0f172a;
   --bg-darker: #020617;
-  --bg-glass: rgba(255, 255, 255, 0.8);
+  --bg-glass: rgba(255, 255, 255, 0.9);
   --bg-glass-strong: rgba(255, 255, 255, 0.95);
   --bg-glass-dark: rgba(15, 23, 42, 0.9);
   --bg-glass-blur: rgba(255, 255, 255, 0.1);
@@ -257,7 +257,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Ultra Enhanced Body Background with Animated Gradients */
+/* Professional Body Background with Animated Gradients */
 body::before {
   content: '';
   position: fixed;
@@ -266,10 +266,10 @@ body::before {
   right: 0;
   bottom: 0;
   background:
-    radial-gradient(circle at 20% 80%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(236, 72, 153, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 60% 10%, rgba(245, 158, 11, 0.03) 0%, transparent 50%);
+    radial-gradient(circle at 20% 80%, rgba(37, 99, 235, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(5, 150, 105, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(14, 165, 233, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 60% 10%, rgba(234, 88, 12, 0.03) 0%, transparent 50%);
   pointer-events: none;
   z-index: -1;
   animation: background-float 20s ease-in-out infinite;
@@ -284,7 +284,7 @@ body::after {
   bottom: 0;
   background:
     radial-gradient(circle at 30% 70%, rgba(16, 185, 129, 0.04) 0%, transparent 50%),
-    radial-gradient(circle at 70% 30%, rgba(59, 130, 246, 0.04) 0%, transparent 50%);
+    radial-gradient(circle at 70% 30%, rgba(96, 165, 250, 0.04) 0%, transparent 50%);
   pointer-events: none;
   z-index: -1;
   animation: background-float-reverse 25s ease-in-out infinite;
@@ -513,7 +513,7 @@ p {
   line-height: var(--line-height-tight);
   border-radius: var(--radius-xl);
   border: 1px solid transparent;
-  cursor: pointer;
+  cursor: pointer !important;
   transition: all var(--transition-spring);
   text-decoration: none;
   gap: var(--space-2);
@@ -1693,23 +1693,23 @@ p {
     --text-on-dark-muted: #cbd5e1;
 
     /* Dark Mode Gradients */
-    --primary-gradient-subtle: linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
+    --primary-gradient-subtle: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(14, 165, 233, 0.2) 100%);
     --bg-glass-blur: rgba(15, 23, 42, 0.2);
   }
 
   /* Dark Mode Body Background */
   body::before {
     background:
-      radial-gradient(circle at 20% 80%, rgba(124, 58, 237, 0.12) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 60% 10%, rgba(245, 158, 11, 0.06) 0%, transparent 50%);
+      radial-gradient(circle at 20% 80%, rgba(37, 99, 235, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(5, 150, 105, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(14, 165, 233, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 60% 10%, rgba(234, 88, 12, 0.06) 0%, transparent 50%);
   }
 
   body::after {
     background:
       radial-gradient(circle at 30% 70%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 70% 30%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+      radial-gradient(circle at 70% 30%, rgba(96, 165, 250, 0.08) 0%, transparent 50%);
   }
 
   /* Dark Mode Card Enhancements */
@@ -1828,7 +1828,7 @@ p {
   --text-on-dark-muted: #cbd5e1;
 
   /* Dark Mode Gradients */
-  --primary-gradient-subtle: linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
+  --primary-gradient-subtle: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(14, 165, 233, 0.2) 100%);
   --bg-glass-blur: rgba(15, 23, 42, 0.2);
 }
 

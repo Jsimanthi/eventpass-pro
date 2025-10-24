@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Eye, EyeOff, Ticket, Mail, Lock } from 'lucide-react';
+import api from './api.js';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -32,13 +32,20 @@ const Login: React.FC = () => {
       setIsLoading(true);
       setMessage('');
       
-      const response = await axios.post('/api/login', {
-        email: formData.email,
-        password: formData.password,
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
       });
 
-      if (response.status === 200) {
-        localStorage.setItem('token', response.data.token);
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('token', data.token);
         setMessage('Login successful! Redirecting...');
         
         // Redirect to the management page after a short delay
@@ -46,7 +53,8 @@ const Login: React.FC = () => {
           window.location.href = '/management';
         }, 1000);
       } else {
-        setMessage(`Error: ${response.data.message}`);
+        const errorText = await response.text();
+        setMessage(`Error: ${errorText || 'Login failed'}`);
       }
     } catch (error: any) {
       if (error.response) {
