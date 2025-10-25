@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 interface LoginProps {
   onLogin: () => void;
@@ -136,9 +137,23 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             color: 'var(--text-secondary)'
           }}>
             <strong>Demo Credentials:</strong><br />
-            Email: user@example.com<br />
+            Email: admin@example.com<br />
             Password: password123
           </div>
+        </div>
+
+        <div style={{ textAlign: 'center', marginTop: 'var(--space-4)' }}>
+          <Link
+            to="/register"
+            style={{
+              color: 'var(--primary-600)',
+              textDecoration: 'none',
+              fontSize: 'var(--font-size-sm)',
+              fontWeight: 'var(--font-weight-medium)'
+            }}
+          >
+            Don't have an account? Sign up
+          </Link>
         </div>
       </div>
     </div>

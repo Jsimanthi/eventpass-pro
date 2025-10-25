@@ -6,6 +6,7 @@ const Login = lazy(() => import('./Login.tsx'));
 const Registration = lazy(() => import('./Registration.tsx'));
 const Live = lazy(() => import('./Live.tsx'));
 const Management = lazy(() => import('./Management.tsx'));
+const EventList = lazy(() => import('./EventList.tsx'));
 const UserManagement = lazy(() => import('./UserManagement.tsx'));
 const Scan = lazy(() => import('./Scan.tsx'));
 const ReprintRequests = lazy(() => import('./ReprintRequests.tsx'));
@@ -60,6 +61,7 @@ const App: React.FC = () => {
 
             <Route path="/live" element={<PrivateRoute><Live /></PrivateRoute>} />
             <Route path="/management" element={<PrivateRoute><Management onLogout={handleLogout} /></PrivateRoute>} />
+            <Route path="/events" element={<PrivateRoute><EventList /></PrivateRoute>} />
             <Route path="/user-management" element={<PrivateRoute><UserManagement /></PrivateRoute>} />
             <Route path="/scan" element={<PrivateRoute><Scan /></PrivateRoute>} />
             <Route path="/reprint-requests" element={<PrivateRoute><ReprintRequests /></PrivateRoute>} />

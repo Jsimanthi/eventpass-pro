@@ -8,7 +8,8 @@ import {
   Radio,
   Zap,
   Clock,
-  AlertCircle
+  AlertCircle,
+  Calendar
 } from 'lucide-react';
 
 interface LiveData {
@@ -183,6 +184,113 @@ const Live: React.FC = () => {
                 Live Active
               </span>
             </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            <a href="/management" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              padding: 'var(--space-3)',
+              borderRadius: 'var(--radius-lg)',
+              textDecoration: 'none',
+              color: 'var(--text-primary)',
+              background: 'var(--gray-50)',
+              border: '1px solid var(--gray-200)'
+            }}>
+              <Activity size={16} />
+              <span>Management</span>
+            </a>
+
+            <a href="/events" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              padding: 'var(--space-3)',
+              borderRadius: 'var(--radius-lg)',
+              textDecoration: 'none',
+              color: 'var(--text-primary)',
+              background: 'var(--gray-50)',
+              border: '1px solid var(--gray-200)'
+            }}>
+              <Calendar size={16} />
+              <span>Events</span>
+            </a>
+
+            <a href="/scan" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              padding: 'var(--space-3)',
+              borderRadius: 'var(--radius-lg)',
+              textDecoration: 'none',
+              color: 'var(--text-primary)',
+              background: 'var(--gray-50)',
+              border: '1px solid var(--gray-200)'
+            }}>
+              <CheckCircle size={16} />
+              <span>Scan QR</span>
+            </a>
+
+            <a href="/user-management" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              padding: 'var(--space-3)',
+              borderRadius: 'var(--radius-lg)',
+              textDecoration: 'none',
+              color: 'var(--text-primary)',
+              background: 'var(--gray-50)',
+              border: '1px solid var(--gray-200)'
+            }}>
+              <Users size={16} />
+              <span>User Management</span>
+            </a>
+
+            <a href="/reprint-requests" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              padding: 'var(--space-3)',
+              borderRadius: 'var(--radius-lg)',
+              textDecoration: 'none',
+              color: 'var(--text-primary)',
+              background: 'var(--gray-50)',
+              border: '1px solid var(--gray-200)'
+            }}>
+              <RefreshCw size={16} />
+              <span>Reprint Requests</span>
+            </a>
+
+            <a href="/queue-monitoring" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              padding: 'var(--space-3)',
+              borderRadius: 'var(--radius-lg)',
+              textDecoration: 'none',
+              color: 'var(--text-primary)',
+              background: 'var(--gray-50)',
+              border: '1px solid var(--gray-200)'
+            }}>
+              <TrendingUp size={16} />
+              <span>Queue Monitoring</span>
+            </a>
+
+            <a href="/privacy-controls" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              padding: 'var(--space-3)',
+              borderRadius: 'var(--radius-lg)',
+              textDecoration: 'none',
+              color: 'var(--text-primary)',
+              background: 'var(--gray-50)',
+              border: '1px solid var(--gray-200)'
+            }}>
+              <AlertCircle size={16} />
+              <span>Privacy Controls</span>
+            </a>
           </div>
         </nav>
       </aside>
