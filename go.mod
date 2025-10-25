@@ -52,7 +52,7 @@ require (
 )
 
 replace (
- 	eventpass.pro/apps/backend => ./apps/backend
- 	eventpass.pro/apps/reprinter => ./apps/reprinter
- 	eventpass.pro/apps/workers => ./apps/workers
+	eventpass.pro/apps/backend => ./apps/backend
+	eventpass.pro/apps/reprinter => ./apps/reprinter
+	eventpass.pro/apps/workers => ./apps/workers
 )
