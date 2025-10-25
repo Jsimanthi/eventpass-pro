@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import EventList from './EventList';
 import {
   BarChart3,
   Users,
@@ -8,15 +7,23 @@ import {
   Download,
   RefreshCw,
   Calendar,
-  UserCheck
+  UserCheck,
+  LogOut,
+  Menu,
+  X
 } from 'lucide-react';
 
-declare global {
-  interface ImportMeta {
-    env: {
-      VITE_API_URL?: string;
-    };
-  }
+interface ManagementProps {
+  onLogout: () => void;
+}
+
+interface Event {
+  id: number;
+  name: string;
+  date: string;
+  location: string;
+  total_invitees?: number;
+  checked_in_count?: number;
 }
 
 interface CheckIn {
@@ -24,18 +31,19 @@ interface CheckIn {
   gift_claimed_at: string;
 }
 
-const Management: React.FC = () => {
+const Management: React.FC<ManagementProps> = ({ onLogout }) => {
+  const [events, setEvents] = useState<Event[]>([]);
   const [checkIns, setCheckIns] = useState<CheckIn[]>([]);
-  const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    fetchCheckIns();
+    fetchData();
   }, []);
 
-  const fetchCheckIns = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
       const response = await fetch('/api/events', {
@@ -81,7 +89,7 @@ const Management: React.FC = () => {
       setCheckIns(allCheckIns);
     } catch (err: any) {
       setError(err.message);
-      console.error('Error fetching check-ins:', err);
+      console.error('Error fetching data:', err);
     } finally {
       setLoading(false);
     }
@@ -94,7 +102,7 @@ const Management: React.FC = () => {
 
     try {
       setExporting(true);
-      
+
       const csvContent = "data:text/csv;charset=utf-8,"
         + ["Email", "Gift Claimed At", "Event"].join(",") + "\n"
         + checkIns.map(checkIn => `"${checkIn.email}","${checkIn.gift_claimed_at}","All Events"`).join("\n");
@@ -119,27 +127,25 @@ const Management: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="container">
-        <div className="loading">
-          <div className="spinner"></div>
-          Loading dashboard...
-        </div>
+      <div className="loading" style={{ minHeight: '100vh' }}>
+        <div className="spinner"></div>
+        <span>Loading dashboard...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container">
+      <div className="container" style={{ paddingTop: 'var(--space-12)' }}>
         <div className="card">
           <div className="card-header">
             <h1 className="card-title">Dashboard Error</h1>
           </div>
           <div className="card-content">
-            <p style={{ color: 'var(--error-color)', marginBottom: 'var(--space-4)' }}>
+            <p style={{ color: 'var(--error-600)', marginBottom: 'var(--space-4)' }}>
               Error: {error}
             </p>
-            <button onClick={fetchCheckIns} className="btn btn-primary">
+            <button onClick={fetchData} className="btn btn-primary">
               Retry
             </button>
           </div>
@@ -149,172 +155,394 @@ const Management: React.FC = () => {
   }
 
   return (
-    <div className="container">
-      {/* Header */}
-      <div className="card">
-        <div className="card-header">
-          <h1 className="card-title">Event Management Dashboard</h1>
-          <p className="card-subtitle">Overview of all your events and check-in statistics</p>
+    <div className="app-layout">
+      {/* Sidebar */}
+      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <div style={{
+          padding: 'var(--space-6)',
+          borderBottom: '1px solid var(--gray-200)',
+          background: 'linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%)'
+        }}>
+          <h2 style={{
+            fontSize: 'var(--font-size-xl)',
+            fontWeight: 'var(--font-weight-bold)',
+            color: 'var(--primary-700)',
+            marginBottom: 'var(--space-1)'
+          }}>
+            EventPass Pro
+          </h2>
+          <p style={{
+            fontSize: 'var(--font-size-sm)',
+            color: 'var(--text-secondary)',
+            margin: 0
+          }}>
+            Management Dashboard
+          </p>
         </div>
-      </div>
 
-      {/* Metrics Cards */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-        gap: 'var(--space-6)',
-        marginBottom: 'var(--space-8)'
-      }}>
-        <div className="card card-interactive">
-          <div className="card-content">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+        <nav style={{ padding: 'var(--space-4)' }}>
+          <div style={{
+            padding: 'var(--space-3)',
+            background: 'var(--primary-50)',
+            borderRadius: 'var(--radius-lg)',
+            marginBottom: 'var(--space-4)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
               <div style={{
-                width: '3rem',
-                height: '3rem',
-                borderRadius: 'var(--radius-lg)',
-                backgroundColor: 'var(--primary-light)',
+                width: '2rem',
+                height: '2rem',
+                borderRadius: 'var(--radius-full)',
+                background: 'var(--primary-500)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 'var(--font-size-xl)',
-                color: 'var(--primary-dark)'
+                justifyContent: 'center'
               }}>
-                <Calendar size={24} />
+                <BarChart3 size={16} color="white" />
               </div>
-              <div>
-                <p style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', margin: 0 }}>
-                  {events.length}
-                </p>
-                <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: 'var(--font-size-sm)' }}>
-                  Total Events
-                </p>
-              </div>
+              <span style={{
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                color: 'var(--primary-700)'
+              }}>
+                Dashboard Active
+              </span>
             </div>
           </div>
-        </div>
+        </nav>
+      </aside>
 
-        <div className="card card-interactive">
-          <div className="card-content">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-              <div style={{
-                width: '3rem',
-                height: '3rem',
-                borderRadius: 'var(--radius-lg)',
-                backgroundColor: 'var(--secondary-light)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 'var(--font-size-xl)',
-                color: 'var(--secondary-dark)'
+      {/* Main Content */}
+      <div className="main-content">
+        {/* Header */}
+        <header style={{
+          background: 'var(--bg-primary)',
+          borderBottom: '1px solid var(--gray-200)',
+          padding: 'var(--space-4) var(--space-6)',
+          position: 'sticky',
+          top: 0,
+          zIndex: 50,
+          boxShadow: 'var(--shadow-sm)'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+              <button
+                className="btn btn-ghost"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                style={{ display: 'block' }}
+              >
+                <Menu size={20} />
+              </button>
+              <h1 style={{
+                fontSize: 'var(--font-size-2xl)',
+                fontWeight: 'var(--font-weight-bold)',
+                color: 'var(--text-primary)',
+                margin: 0
               }}>
-                <Users size={24} />
-              </div>
-              <div>
-                <p style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', margin: 0 }}>
-                  {totalInvitees}
-                </p>
-                <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: 'var(--font-size-sm)' }}>
-                  Total Invitees
-                </p>
-              </div>
+                Event Management Dashboard
+              </h1>
             </div>
-          </div>
-        </div>
 
-        <div className="card card-interactive">
-          <div className="card-content">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-              <div style={{
-                width: '3rem',
-                height: '3rem',
-                borderRadius: 'var(--radius-lg)',
-                backgroundColor: 'var(--success-color)',
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 'var(--font-size-xl)'
-              }}>
-                <UserCheck size={24} />
-              </div>
-              <div>
-                <p style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', margin: 0 }}>
-                  {totalCheckedIn}
-                </p>
-                <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: 'var(--font-size-sm)' }}>
-                  Checked In
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="card card-interactive">
-          <div className="card-content">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-              <div style={{
-                width: '3rem',
-                height: '3rem',
-                borderRadius: 'var(--radius-lg)',
-                backgroundColor: 'var(--accent-light)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 'var(--font-size-xl)',
-                color: 'var(--accent-dark)'
-              }}>
-                <TrendingUp size={24} />
-              </div>
-              <div>
-                <p style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', margin: 0 }}>
-                  {checkInRate}%
-                </p>
-                <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: 'var(--font-size-sm)' }}>
-                  Check-in Rate
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Actions and Export */}
-      <div className="card">
-        <div className="card-header">
-          <h2 className="card-title">Quick Actions</h2>
-        </div>
-        <div className="card-content">
-          <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'center', flexWrap: 'wrap' }}>
             <button
-              onClick={handleExport}
-              disabled={checkIns.length === 0 || exporting}
-              className="btn btn-success"
-            >
-              {exporting ? (
-                <>
-                  <div className="spinner spinner-sm"></div>
-                  Exporting...
-                </>
-              ) : (
-                <>
-                  <Download size={16} style={{ marginRight: 'var(--space-2)' }} />
-                  Export CSV ({checkIns.length} records)
-                </>
-              )}
-            </button>
-            <button
-              onClick={fetchCheckIns}
+              onClick={onLogout}
               className="btn btn-outline"
+              style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
             >
-              <RefreshCw size={16} style={{ marginRight: 'var(--space-2)' }} />
-              Refresh Data
+              <LogOut size={16} />
+              Logout
             </button>
+          </div>
+        </header>
+
+        <div className="content-area">
+          {/* Metrics Cards */}
+          <div className="grid grid-cols-4" style={{
+            gap: 'var(--space-6)',
+            marginBottom: 'var(--space-8)'
+          }}>
+            <div className="card">
+              <div className="card-content">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                  <div style={{
+                    width: '3rem',
+                    height: '3rem',
+                    borderRadius: 'var(--radius-lg)',
+                    background: 'linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white'
+                  }}>
+                    <Calendar size={24} />
+                  </div>
+                  <div>
+                    <p style={{
+                      fontSize: 'var(--font-size-2xl)',
+                      fontWeight: 'var(--font-weight-bold)',
+                      margin: 0,
+                      color: 'var(--text-primary)'
+                    }}>
+                      {events.length}
+                    </p>
+                    <p style={{
+                      color: 'var(--text-secondary)',
+                      margin: 0,
+                      fontSize: 'var(--font-size-sm)'
+                    }}>
+                      Total Events
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="card">
+              <div className="card-content">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                  <div style={{
+                    width: '3rem',
+                    height: '3rem',
+                    borderRadius: 'var(--radius-lg)',
+                    background: 'linear-gradient(135deg, var(--success-500) 0%, var(--success-600) 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white'
+                  }}>
+                    <Users size={24} />
+                  </div>
+                  <div>
+                    <p style={{
+                      fontSize: 'var(--font-size-2xl)',
+                      fontWeight: 'var(--font-weight-bold)',
+                      margin: 0,
+                      color: 'var(--text-primary)'
+                    }}>
+                      {totalInvitees}
+                    </p>
+                    <p style={{
+                      color: 'var(--text-secondary)',
+                      margin: 0,
+                      fontSize: 'var(--font-size-sm)'
+                    }}>
+                      Total Invitees
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="card">
+              <div className="card-content">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                  <div style={{
+                    width: '3rem',
+                    height: '3rem',
+                    borderRadius: 'var(--radius-lg)',
+                    background: 'linear-gradient(135deg, var(--warning-500) 0%, var(--warning-600) 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white'
+                  }}>
+                    <UserCheck size={24} />
+                  </div>
+                  <div>
+                    <p style={{
+                      fontSize: 'var(--font-size-2xl)',
+                      fontWeight: 'var(--font-weight-bold)',
+                      margin: 0,
+                      color: 'var(--text-primary)'
+                    }}>
+                      {totalCheckedIn}
+                    </p>
+                    <p style={{
+                      color: 'var(--text-secondary)',
+                      margin: 0,
+                      fontSize: 'var(--font-size-sm)'
+                    }}>
+                      Checked In
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="card">
+              <div className="card-content">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                  <div style={{
+                    width: '3rem',
+                    height: '3rem',
+                    borderRadius: 'var(--radius-lg)',
+                    background: 'linear-gradient(135deg, var(--error-500) 0%, var(--error-600) 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white'
+                  }}>
+                    <TrendingUp size={24} />
+                  </div>
+                  <div>
+                    <p style={{
+                      fontSize: 'var(--font-size-2xl)',
+                      fontWeight: 'var(--font-weight-bold)',
+                      margin: 0,
+                      color: 'var(--text-primary)'
+                    }}>
+                      {checkInRate}%
+                    </p>
+                    <p style={{
+                      color: 'var(--text-secondary)',
+                      margin: 0,
+                      fontSize: 'var(--font-size-sm)'
+                    }}>
+                      Check-in Rate
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="card" style={{ marginBottom: 'var(--space-8)' }}>
+            <div className="card-header">
+              <h2 className="card-title">Quick Actions</h2>
+            </div>
+            <div className="card-content">
+              <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'center', flexWrap: 'wrap' }}>
+                <button
+                  onClick={handleExport}
+                  disabled={checkIns.length === 0 || exporting}
+                  className="btn btn-success"
+                >
+                  {exporting ? (
+                    <>
+                      <div className="spinner" style={{ width: '1rem', height: '1rem', marginRight: 'var(--space-2)' }}></div>
+                      Exporting...
+                    </>
+                  ) : (
+                    <>
+                      <Download size={16} style={{ marginRight: 'var(--space-2)' }} />
+                      Export CSV ({checkIns.length} records)
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={fetchData}
+                  className="btn btn-outline"
+                >
+                  <RefreshCw size={16} style={{ marginRight: 'var(--space-2)' }} />
+                  Refresh Data
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Events Table */}
+          <div className="card">
+            <div className="card-header">
+              <h2 className="card-title">Events Overview</h2>
+              <p className="card-subtitle">Manage your events and track performance</p>
+            </div>
+            <div className="card-content">
+              {events.length === 0 ? (
+                <div style={{
+                  textAlign: 'center',
+                  padding: 'var(--space-12)',
+                  color: 'var(--text-secondary)'
+                }}>
+                  <p style={{ fontSize: 'var(--font-size-lg)', marginBottom: 'var(--space-4)' }}>
+                    No events found
+                  </p>
+                  <p>Create your first event to get started with EventPass Pro.</p>
+                </div>
+              ) : (
+                <div className="table-container">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>Date</th>
+                        <th>Invitees</th>
+                        <th>Checked In</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {events.map(event => {
+                        const isValidDate = event.date && !isNaN(new Date(event.date).getTime());
+                        const formattedDate = isValidDate ? new Date(event.date).toLocaleString() : 'Invalid Date';
+                        const checkInRate = event.total_invitees && event.total_invitees > 0
+                          ? Math.round((event.checked_in_count || 0) / event.total_invitees * 100)
+                          : 0;
+
+                        return (
+                          <tr key={event.id}>
+                            <td style={{ fontWeight: 'var(--font-weight-medium)' }}>
+                              #{event.id}
+                            </td>
+                            <td style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--text-primary)' }}>
+                              {event.name || 'Unnamed Event'}
+                            </td>
+                            <td style={{ color: 'var(--text-secondary)' }}>
+                              {event.location || 'No Location'}
+                            </td>
+                            <td style={{ color: 'var(--text-secondary)' }}>
+                              {formattedDate}
+                            </td>
+                            <td>
+                              <span className="badge badge-success">
+                                {event.total_invitees || 0}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="badge badge-warning">
+                                {event.checked_in_count || 0}
+                              </span>
+                            </td>
+                            <td>
+                              {checkInRate >= 80 ? (
+                                <span className="badge badge-success">Excellent</span>
+                              ) : checkInRate >= 60 ? (
+                                <span className="badge badge-warning">Good</span>
+                              ) : (
+                                <span className="badge badge-error">Needs Attention</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Events List */}
-      <EventList />
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 40
+          }}
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
     </div>
   );
 };

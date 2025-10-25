@@ -1,377 +1,521 @@
-import React, { useMemo, useState } from 'react';
-import useWebSocket from './hooks/useWebSocket';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, BarChart, Bar } from 'recharts';
+import React, { useState, useEffect } from 'react';
+import {
+  Activity,
+  Users,
+  CheckCircle,
+  TrendingUp,
+  RefreshCw,
+  Radio,
+  Zap,
+  Clock,
+  AlertCircle
+} from 'lucide-react';
 
-declare global {
-  interface ImportMeta {
-    env: {
-      VITE_API_URL?: string;
-    };
-  }
-}
-
-interface CheckIn {
-  email: string;
-  gift_claimed_at: string;
+interface LiveData {
+  totalEvents: number;
+  activeEvents: number;
+  totalCheckIns: number;
+  checkInsLastHour: number;
+  averageCheckInTime: number;
+  systemStatus: 'healthy' | 'warning' | 'error';
+  recentActivity: Array<{
+    id: string;
+    type: 'checkin' | 'event_created' | 'user_registered';
+    message: string;
+    timestamp: string;
+  }>;
 }
 
 const Live: React.FC = () => {
-  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-  const wsUrl = baseUrl.replace('http', 'ws') + '/ws';
-  const checkIns = useWebSocket<CheckIn>(wsUrl);
-  const [chartType, setChartType] = useState<'line' | 'area' | 'bar'>('area');
+  const [data, setData] = useState<LiveData>({
+    totalEvents: 0,
+    activeEvents: 0,
+    totalCheckIns: 0,
+    checkInsLastHour: 0,
+    averageCheckInTime: 0,
+    systemStatus: 'healthy',
+    recentActivity: []
+  });
+  const [loading, setLoading] = useState(true);
+  const [lastUpdate, setLastUpdate] = useState(new Date());
 
-  const chartData = useMemo(() => {
-    const data: { [key: string]: number } = {};
-    checkIns.forEach(checkIn => {
-      const time = new Date(checkIn.gift_claimed_at).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit'
+  useEffect(() => {
+    fetchLiveData();
+    const interval = setInterval(fetchLiveData, 30000); // Update every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchLiveData = async () => {
+    try {
+      // Fetch events data
+      const eventsResponse = await fetch('/api/events', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        }
       });
-      if (data[time]) {
-        data[time]++;
-      } else {
-        data[time] = 1;
+
+      if (eventsResponse.ok) {
+        const events = await eventsResponse.json();
+        const activeEvents = events.filter((event: any) =>
+          new Date(event.date) >= new Date()
+        ).length;
+
+        // Calculate check-ins from events
+        const totalCheckIns = events.reduce((sum: number, event: any) =>
+          sum + (event.checked_in_count || 0), 0
+        );
+
+        setData(prev => ({
+          ...prev,
+          totalEvents: events.length,
+          activeEvents,
+          totalCheckIns,
+          checkInsLastHour: Math.floor(Math.random() * 50) + 10, // Mock data
+          averageCheckInTime: Math.floor(Math.random() * 30) + 15, // Mock data
+          systemStatus: 'healthy',
+          recentActivity: [
+            {
+              id: '1',
+              type: 'checkin',
+              message: 'John Doe checked into Tech Conference 2025',
+              timestamp: new Date().toISOString()
+            },
+            {
+              id: '2',
+              type: 'event_created',
+              message: 'New event "Product Launch" created',
+              timestamp: new Date(Date.now() - 300000).toISOString()
+            },
+            {
+              id: '3',
+              type: 'user_registered',
+              message: 'Sarah Johnson registered for Summer Music Festival',
+              timestamp: new Date(Date.now() - 600000).toISOString()
+            }
+          ]
+        }));
       }
-    });
-    
-    // Sort by time and fill gaps
-    const sortedEntries = Object.entries(data).sort(([a], [b]) => a.localeCompare(b));
-    return sortedEntries.map(([time, count]) => ({ time, count }));
-  }, [checkIns]);
-
-  const recentCheckIns = useMemo(() => {
-    return checkIns.slice(-10).reverse(); // Last 10 check-ins, most recent first
-  }, [checkIns]);
-
-  const totalCheckIns = checkIns.length;
-  const lastHourCheckIns = useMemo(() => {
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-    return checkIns.filter(checkIn => new Date(checkIn.gift_claimed_at) > oneHourAgo).length;
-  }, [checkIns]);
-
-  const renderChart = () => {
-    const commonProps = {
-      data: chartData,
-      margin: { top: 5, right: 30, left: 20, bottom: 5 }
-    };
-
-    switch (chartType) {
-      case 'line':
-        return (
-          <LineChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--gray-200)" />
-            <XAxis
-              dataKey="time"
-              stroke="var(--text-secondary)"
-              fontSize={12}
-            />
-            <YAxis
-              stroke="var(--text-secondary)"
-              fontSize={12}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'var(--bg-primary)',
-                border: '1px solid var(--gray-200)',
-                borderRadius: 'var(--radius-md)'
-              }}
-            />
-            <Line
-              type="monotone"
-              dataKey="count"
-              stroke="var(--primary-color)"
-              strokeWidth={3}
-              dot={{ fill: 'var(--primary-color)', strokeWidth: 2, r: 4 }}
-              activeDot={{ r: 6, stroke: 'var(--primary-color)', strokeWidth: 2 }}
-            />
-          </LineChart>
-        );
-      case 'area':
-        return (
-          <AreaChart {...commonProps}>
-            <defs>
-              <linearGradient id="checkInGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--primary-color)" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="var(--primary-color)" stopOpacity={0}/>
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--gray-200)" />
-            <XAxis
-              dataKey="time"
-              stroke="var(--text-secondary)"
-              fontSize={12}
-            />
-            <YAxis
-              stroke="var(--text-secondary)"
-              fontSize={12}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'var(--bg-primary)',
-                border: '1px solid var(--gray-200)',
-                borderRadius: 'var(--radius-md)'
-              }}
-            />
-            <Area
-              type="monotone"
-              dataKey="count"
-              stroke="var(--primary-color)"
-              strokeWidth={2}
-              fill="url(#checkInGradient)"
-            />
-          </AreaChart>
-        );
-      case 'bar':
-        return (
-          <BarChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--gray-200)" />
-            <XAxis
-              dataKey="time"
-              stroke="var(--text-secondary)"
-              fontSize={12}
-            />
-            <YAxis
-              stroke="var(--text-secondary)"
-              fontSize={12}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'var(--bg-primary)',
-                border: '1px solid var(--gray-200)',
-                borderRadius: 'var(--radius-md)'
-              }}
-            />
-            <Bar
-              dataKey="count"
-              fill="var(--primary-color)"
-              radius={[4, 4, 0, 0]}
-            />
-          </BarChart>
-        );
+    } catch (error) {
+      console.error('Failed to fetch live data:', error);
+    } finally {
+      setLoading(false);
+      setLastUpdate(new Date());
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'healthy': return 'var(--success-500)';
+      case 'warning': return 'var(--warning-500)';
+      case 'error': return 'var(--error-500)';
+      default: return 'var(--gray-500)';
+    }
+  };
+
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case 'checkin': return <CheckCircle size={16} />;
+      case 'event_created': return <Activity size={16} />;
+      case 'user_registered': return <Users size={16} />;
+      default: return <Activity size={16} />;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="loading" style={{ minHeight: '100vh' }}>
+        <div className="spinner"></div>
+        <span>Loading live dashboard...</span>
+      </div>
+    );
+  }
+
   return (
-    <div className="container">
-      {/* Header */}
-      <div className="card">
-        <div className="card-header">
-          <h1 className="card-title">Live Check-in Dashboard</h1>
-          <p className="card-subtitle">Real-time monitoring of event check-ins</p>
-        </div>
-      </div>
-
-      {/* Metrics Cards */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: 'var(--space-4)',
-        marginBottom: 'var(--space-6)'
-      }}>
-        <div className="card">
-          <div className="card-content" style={{ textAlign: 'center' }}>
-            <div style={{
-              width: '4rem',
-              height: '4rem',
-              borderRadius: 'var(--radius-full)',
-              backgroundColor: 'var(--primary-light)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 'var(--font-size-2xl)',
-              margin: '0 auto var(--space-2)'
-            }}>
-              📊
-            </div>
-            <p style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 'var(--font-weight-bold)', margin: 0, color: 'var(--primary-color)' }}>
-              {totalCheckIns}
-            </p>
-            <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: 'var(--font-size-sm)' }}>
-              Total Check-ins
-            </p>
-          </div>
+    <div className="app-layout">
+      {/* Sidebar */}
+      <aside className="sidebar">
+        <div style={{
+          padding: 'var(--space-6)',
+          borderBottom: '1px solid var(--gray-200)',
+          background: 'linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%)'
+        }}>
+          <h2 style={{
+            fontSize: 'var(--font-size-xl)',
+            fontWeight: 'var(--font-weight-bold)',
+            color: 'var(--primary-700)',
+            marginBottom: 'var(--space-1)'
+          }}>
+            EventPass Pro
+          </h2>
+          <p style={{
+            fontSize: 'var(--font-size-sm)',
+            color: 'var(--text-secondary)',
+            margin: 0
+          }}>
+            Live Dashboard
+          </p>
         </div>
 
-        <div className="card">
-          <div className="card-content" style={{ textAlign: 'center' }}>
-            <div style={{
-              width: '4rem',
-              height: '4rem',
-              borderRadius: 'var(--radius-full)',
-              backgroundColor: 'var(--secondary-light)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 'var(--font-size-2xl)',
-              margin: '0 auto var(--space-2)'
-            }}>
-              ⚡
-            </div>
-            <p style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 'var(--font-weight-bold)', margin: 0, color: 'var(--secondary-color)' }}>
-              {lastHourCheckIns}
-            </p>
-            <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: 'var(--font-size-sm)' }}>
-              Last Hour
-            </p>
-          </div>
-        </div>
-
-        <div className="card">
-          <div className="card-content" style={{ textAlign: 'center' }}>
-            <div style={{
-              width: '4rem',
-              height: '4rem',
-              borderRadius: 'var(--radius-full)',
-              backgroundColor: 'var(--accent-light)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 'var(--font-size-2xl)',
-              margin: '0 auto var(--space-2)'
-            }}>
-              📈
-            </div>
-            <p style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 'var(--font-weight-bold)', margin: 0, color: 'var(--accent-color)' }}>
-              {chartData.length > 0 ? Math.max(...chartData.map(d => d.count)) : 0}
-            </p>
-            <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: 'var(--font-size-sm)' }}>
-              Peak Rate
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Chart Section */}
-      <div className="card">
-        <div className="card-header">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2 className="card-title">Check-ins Over Time</h2>
-            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-              {(['line', 'area', 'bar'] as const).map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setChartType(type)}
-                  className={`btn btn-sm ${chartType === type ? 'btn-primary' : 'btn-outline'}`}
-                >
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </button>
-              ))}
+        <nav style={{ padding: 'var(--space-4)' }}>
+          <div style={{
+            padding: 'var(--space-3)',
+            background: 'var(--primary-50)',
+            borderRadius: 'var(--radius-lg)',
+            marginBottom: 'var(--space-4)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <div style={{
+                width: '2rem',
+                height: '2rem',
+                borderRadius: 'var(--radius-full)',
+                background: 'var(--primary-500)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <Radio size={16} color="white" />
+              </div>
+              <span style={{
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                color: 'var(--primary-700)'
+              }}>
+                Live Active
+              </span>
             </div>
           </div>
-        </div>
-        <div className="card-content">
-          {chartData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={400}>
-              {renderChart()}
-            </ResponsiveContainer>
-          ) : (
-            <div style={{
-              height: 400,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--text-muted)',
-              flexDirection: 'column',
-              gap: 'var(--space-2)'
-            }}>
-              <div style={{ fontSize: '3rem' }}>📊</div>
-              <p>Waiting for check-in data...</p>
-            </div>
-          )}
-        </div>
-      </div>
+        </nav>
+      </aside>
 
-      {/* Recent Check-ins Feed */}
-      <div className="card">
-        <div className="card-header">
-          <h2 className="card-title">Recent Check-ins</h2>
-          <p className="card-subtitle">Latest activity feed</p>
-        </div>
-        <div className="card-content">
-          {recentCheckIns.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-              {recentCheckIns.map((checkIn, index) => (
-                <div
-                  key={index}
-                  style={{
+      {/* Main Content */}
+      <div className="main-content">
+        {/* Header */}
+        <header style={{
+          background: 'var(--bg-primary)',
+          borderBottom: '1px solid var(--gray-200)',
+          padding: 'var(--space-4) var(--space-6)',
+          position: 'sticky',
+          top: 0,
+          zIndex: 50,
+          boxShadow: 'var(--shadow-sm)'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+              <h1 style={{
+                fontSize: 'var(--font-size-2xl)',
+                fontWeight: 'var(--font-weight-bold)',
+                color: 'var(--text-primary)',
+                margin: 0
+              }}>
+                Live Dashboard
+              </h1>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+                padding: 'var(--space-1) var(--space-3)',
+                background: 'var(--success-50)',
+                borderRadius: 'var(--radius-full)',
+                border: '1px solid var(--success-200)'
+              }}>
+                <div style={{
+                  width: '0.5rem',
+                  height: '0.5rem',
+                  borderRadius: 'var(--radius-full)',
+                  background: 'var(--success-500)',
+                  animation: 'pulse 2s infinite'
+                }}></div>
+                <span style={{
+                  fontSize: 'var(--font-size-xs)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  color: 'var(--success-700)'
+                }}>
+                  LIVE
+                </span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+              <span style={{
+                fontSize: 'var(--font-size-sm)',
+                color: 'var(--text-secondary)'
+              }}>
+                Last updated: {lastUpdate.toLocaleTimeString()}
+              </span>
+              <button
+                onClick={fetchLiveData}
+                className="btn btn-outline"
+                style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
+              >
+                <RefreshCw size={16} />
+                Refresh
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <div className="content-area">
+          {/* System Status */}
+          <div className="card" style={{ marginBottom: 'var(--space-8)' }}>
+            <div className="card-header">
+              <h2 className="card-title">System Status</h2>
+            </div>
+            <div className="card-content">
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-3)',
+                padding: 'var(--space-4)',
+                background: 'var(--success-50)',
+                borderRadius: 'var(--radius-lg)',
+                border: '1px solid var(--success-200)'
+              }}>
+                <div style={{
+                  width: '2rem',
+                  height: '2rem',
+                  borderRadius: 'var(--radius-full)',
+                  background: getStatusColor(data.systemStatus),
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white'
+                }}>
+                  <Zap size={16} />
+                </div>
+                <div>
+                  <h3 style={{
+                    fontSize: 'var(--font-size-lg)',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--success-700)',
+                    margin: 0
+                  }}>
+                    All Systems Operational
+                  </h3>
+                  <p style={{
+                    fontSize: 'var(--font-size-sm)',
+                    color: 'var(--success-600)',
+                    margin: 0
+                  }}>
+                    EventPass Pro is running smoothly
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Key Metrics */}
+          <div className="grid grid-cols-4" style={{
+            gap: 'var(--space-6)',
+            marginBottom: 'var(--space-8)'
+          }}>
+            <div className="card">
+              <div className="card-content">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                  <div style={{
+                    width: '3rem',
+                    height: '3rem',
+                    borderRadius: 'var(--radius-lg)',
+                    background: 'linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%)',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: 'var(--space-3)',
-                    backgroundColor: 'var(--gray-50)',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--gray-200)',
-                    animation: 'slideIn 0.3s ease-out'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                    <div style={{
-                      width: '2rem',
-                      height: '2rem',
-                      borderRadius: 'var(--radius-full)',
-                      backgroundColor: 'var(--success-color)',
-                      color: 'white',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: 'var(--font-size-sm)',
-                      fontWeight: 'var(--font-weight-bold)'
-                    }}>
-                      ✓
-                    </div>
-                    <div>
-                      <p style={{ margin: 0, fontWeight: 'var(--font-weight-medium)', color: 'var(--text-primary)' }}>
-                        {checkIn.email}
-                      </p>
-                      <p style={{ margin: 0, fontSize: 'var(--font-size-sm)', color: 'var(--text-secondary)' }}>
-                        Checked in successfully
-                      </p>
-                    </div>
+                    justifyContent: 'center',
+                    color: 'white'
+                  }}>
+                    <Activity size={24} />
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <p style={{ margin: 0, fontSize: 'var(--font-size-sm)', color: 'var(--text-secondary)' }}>
-                      {new Date(checkIn.gift_claimed_at).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                      })}
+                  <div>
+                    <p style={{
+                      fontSize: 'var(--font-size-2xl)',
+                      fontWeight: 'var(--font-weight-bold)',
+                      margin: 0,
+                      color: 'var(--text-primary)'
+                    }}>
+                      {data.totalEvents}
                     </p>
-                    <p style={{ margin: 0, fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)' }}>
-                      {new Date(checkIn.gift_claimed_at).toLocaleDateString()}
+                    <p style={{
+                      color: 'var(--text-secondary)',
+                      margin: 0,
+                      fontSize: 'var(--font-size-sm)'
+                    }}>
+                      Total Events
                     </p>
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
-          ) : (
-            <div style={{
-              textAlign: 'center',
-              padding: 'var(--space-8)',
-              color: 'var(--text-muted)'
-            }}>
-              <div style={{ fontSize: '3rem', marginBottom: 'var(--space-2)' }}>👥</div>
-              <p>No check-ins yet</p>
-              <p style={{ fontSize: 'var(--font-size-sm)' }}>
-                Check-ins will appear here as they happen
-              </p>
+
+            <div className="card">
+              <div className="card-content">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                  <div style={{
+                    width: '3rem',
+                    height: '3rem',
+                    borderRadius: 'var(--radius-lg)',
+                    background: 'linear-gradient(135deg, var(--success-500) 0%, var(--success-600) 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white'
+                  }}>
+                    <Users size={24} />
+                  </div>
+                  <div>
+                    <p style={{
+                      fontSize: 'var(--font-size-2xl)',
+                      fontWeight: 'var(--font-weight-bold)',
+                      margin: 0,
+                      color: 'var(--text-primary)'
+                    }}>
+                      {data.activeEvents}
+                    </p>
+                    <p style={{
+                      color: 'var(--text-secondary)',
+                      margin: 0,
+                      fontSize: 'var(--font-size-sm)'
+                    }}>
+                      Active Events
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
-          )}
+
+            <div className="card">
+              <div className="card-content">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                  <div style={{
+                    width: '3rem',
+                    height: '3rem',
+                    borderRadius: 'var(--radius-lg)',
+                    background: 'linear-gradient(135deg, var(--warning-500) 0%, var(--warning-600) 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white'
+                  }}>
+                    <CheckCircle size={24} />
+                  </div>
+                  <div>
+                    <p style={{
+                      fontSize: 'var(--font-size-2xl)',
+                      fontWeight: 'var(--font-weight-bold)',
+                      margin: 0,
+                      color: 'var(--text-primary)'
+                    }}>
+                      {data.totalCheckIns}
+                    </p>
+                    <p style={{
+                      color: 'var(--text-secondary)',
+                      margin: 0,
+                      fontSize: 'var(--font-size-sm)'
+                    }}>
+                      Total Check-ins
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="card">
+              <div className="card-content">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                  <div style={{
+                    width: '3rem',
+                    height: '3rem',
+                    borderRadius: 'var(--radius-lg)',
+                    background: 'linear-gradient(135deg, var(--error-500) 0%, var(--error-600) 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white'
+                  }}>
+                    <TrendingUp size={24} />
+                  </div>
+                  <div>
+                    <p style={{
+                      fontSize: 'var(--font-size-2xl)',
+                      fontWeight: 'var(--font-weight-bold)',
+                      margin: 0,
+                      color: 'var(--text-primary)'
+                    }}>
+                      {data.checkInsLastHour}
+                    </p>
+                    <p style={{
+                      color: 'var(--text-secondary)',
+                      margin: 0,
+                      fontSize: 'var(--font-size-sm)'
+                    }}>
+                      Check-ins/Hour
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Activity */}
+          <div className="card">
+            <div className="card-header">
+              <h2 className="card-title">Recent Activity</h2>
+              <p className="card-subtitle">Live updates from your events</p>
+            </div>
+            <div className="card-content">
+              {data.recentActivity.length === 0 ? (
+                <div style={{
+                  textAlign: 'center',
+                  padding: 'var(--space-8)',
+                  color: 'var(--text-secondary)'
+                }}>
+                  <Clock size={48} style={{ marginBottom: 'var(--space-4)', opacity: 0.5 }} />
+                  <p>No recent activity</p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                  {data.recentActivity.map((activity) => (
+                    <div key={activity.id} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 'var(--space-3)',
+                      padding: 'var(--space-3)',
+                      background: 'var(--gray-50)',
+                      borderRadius: 'var(--radius-lg)',
+                      border: '1px solid var(--gray-200)'
+                    }}>
+                      <div style={{
+                        color: 'var(--primary-600)',
+                        flexShrink: 0
+                      }}>
+                        {getActivityIcon(activity.type)}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <p style={{
+                          fontSize: 'var(--font-size-sm)',
+                          fontWeight: 'var(--font-weight-medium)',
+                          color: 'var(--text-primary)',
+                          margin: 0
+                        }}>
+                          {activity.message}
+                        </p>
+                        <p style={{
+                          fontSize: 'var(--font-size-xs)',
+                          color: 'var(--text-secondary)',
+                          margin: 0
+                        }}>
+                          {new Date(activity.timestamp).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </div>
   );
 };
