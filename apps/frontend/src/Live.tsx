@@ -9,7 +9,8 @@ import {
   Zap,
   Clock,
   AlertCircle,
-  Calendar
+  Calendar,
+  LogOut
 } from 'lucide-react';
 
 interface LiveData {
@@ -39,6 +40,11 @@ const Live: React.FC = () => {
   });
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState(new Date());
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/login';
+  };
 
   useEffect(() => {
     fetchLiveData();
@@ -361,6 +367,14 @@ const Live: React.FC = () => {
               >
                 <RefreshCw size={16} />
                 Refresh
+              </button>
+              <button
+                onClick={handleLogout}
+                className="btn btn-outline"
+                style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
+              >
+                <LogOut size={16} />
+                Logout
               </button>
             </div>
           </div>
